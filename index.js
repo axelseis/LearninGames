@@ -42,9 +42,8 @@ var express = require('express'),
     FacebookStrategy = require('passport-facebook');
     socketIO = require('socket.io');
 
-//We will be creating these two files shortly
-// var config = require('./config.js'), //config file contains all tokens and other private info
-//    funct = require('./functions.js'); //funct file contains our helper functions for our Passport and database work
+var config = require('./config.js'), //config file contains all tokens and other private info
+    funct = require('./functions.js'); //funct file contains our helper functions for our Passport and database work
 
 var app = express();
 var port = process.env.PORT || 5000; //select your port or let it pull from your .env file
@@ -53,11 +52,69 @@ var io = socketIO.listen(server);
 
 console.log("listening on " + port + "!");
 
+
 //===============PASSPORT===============
 
-//This section will contain our work with Passport
+// Use the LocalStrategy within Passport to login/”signin” users.
+passport.use('local-signin', new LocalStrategy(
+  {passReqToCallback : true}, //allows us to pass back the request to the callback
+  function(req, username, password, done) {
+    funct.localAuth(username, password)
+    .then(function (user) {
+      if (user) {
+        console.log("LOGGED IN AS: " + user.username);
+        req.session.success = 'You are successfully logged in ' + user.username + '!';
+        done(null, user);
+      }
+      if (!user) {
+        console.log("COULD NOT LOG IN");
+        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
+        done(null, user);
+      }
+    })
+    .fail(function (err){
+      console.log(err.body);
+    });
+  }
+));
+
+// Use the LocalStrategy within Passport to register/"signup" users.
+passport.use('local-signup', new LocalStrategy(
+  {passReqToCallback : true}, //allows us to pass back the request to the callback
+  function(req, username, password, done) {
+    funct.localReg(username, password)
+    .then(function (user) {
+      if (user) {
+        console.log("REGISTERED: " + user.username);
+        req.session.success = 'You are successfully registered and logged in ' + user.username + '!';
+        done(null, user);
+      }
+      if (!user) {
+        console.log("COULD NOT REGISTER");
+        req.session.error = 'That username is already in use, please try a different one.'; //inform user could not log them in
+        done(null, user);
+      }
+    })
+    .fail(function (err){
+      console.log(err.body);
+    });
+  }
+));
+
+// Passport session setup.
+passport.serializeUser(function(user, done) {
+  console.log("serializing " + user.username);
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  console.log("deserializing " + obj);
+  done(null, obj);
+});
+
 
 //===============EXPRESS================
+
 // Configure Express
 app.use(logger('combined'));
 app.use(cookieParser());
@@ -87,10 +144,11 @@ app.use(function(req, res, next){
 
 // Configure express to use handlebars templates
 var hbs = exphbs.create({
-    defaultLayout: 'main', //we will be creating this layout shortly
+    defaultLayout: 'main', 
 });
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
+
 
 //===============ROUTES===============
 

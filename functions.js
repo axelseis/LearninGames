@@ -6,15 +6,30 @@ var bcrypt = require('bcryptjs'),
     config = require('./config.js'), //config file contains all tokens and other private info
     db = require('orchestrate')(config.db); //config.db holds Orchestrate token
 
+var User = function(){
+	return {
+		"username": '',
+		"password": '',
+		"avatar": '',
+		"google": {
+			"id": 'busca',
+			"token": '',
+			"name": '',
+			"email": ''
+		}		
+	}
+};
+
 //used in local-signup strategy
 exports.localReg = function (username, password) {
   var deferred = Q.defer();
   var hash = bcrypt.hashSync(password, 8);
-  var user = {
-    "username": username,
-    "password": hash,
-    "avatar": "https://api.adorable.io/avatars/285/" + user + "@learningames.png"
-  }
+  var user = new User()
+
+  user.username = username;
+  user.password = hash;
+  user.avatar = "https://api.adorable.io/avatars/285/" + username + "@learningames.png";
+
   //check if username is already assigned in our database
   db.get('local-users', username)
   .then(function (result){ //case in which user already exists in db
@@ -71,4 +86,53 @@ exports.localAuth = function (username, password) {
   });
 
   return deferred.promise;
+};
+
+
+exports.googleAuth = function (profile) {
+  var deferred = Q.defer();
+
+  db.get('local-users', "query=google.id==busca")
+  .then(function (result){
+    console.log("FOUND USER " + result.body.username);
+    deferred.resolve(result.body);
+  }).fail(function (err){
+    if (err.body.message == 'The requested items could not be found.'){
+          console.log("COULD NOT FIND USER IN DB FOR SIGNIN");
+          deferred.resolve(false);
+    } else {
+      console.log('ERROR: ' + err)
+      deferred.reject(new Error(err));
+    }
+  });
+
+  return deferred.promise;
 }
+            /*
+            User.findOne({ 'google.id' : profile.id }, function(err, user) {
+                if (err)
+                    return done(err);
+
+                if (user) {
+
+                    // if a user is found, log them in
+                    return done(null, user);
+                } else {
+                    // if the user isnt in our database, create a new user
+                    var newUser          = new User();
+
+                    // set all of the relevant information
+                    newUser.google.id    = profile.id;
+                    newUser.google.token = token;
+                    newUser.google.name  = profile.displayName;
+                    newUser.google.email = profile.emails[0].value; // pull the first email
+
+                    // save the user
+                    newUser.save(function(err) {
+                        if (err)
+                            throw err;
+                        return done(null, newUser);
+                    });
+                }
+            });
+            */

@@ -37,9 +37,9 @@ var express = require('express'),
     session = require('express-session'),
     passport = require('passport'),
     LocalStrategy = require('passport-local'),
-    TwitterStrategy = require('passport-twitter'),
-    GoogleStrategy = require('passport-google'),
-    FacebookStrategy = require('passport-facebook');
+    //TwitterStrategy = require('passport-twitter'),
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+    FacebookStrategy = require('passport-facebook'),
     socketIO = require('socket.io');
 
 var config = require('./config.js'), //config file contains all tokens and other private info
@@ -92,6 +92,32 @@ passport.use('local-signup', new LocalStrategy(
       if (!user) {
         console.log("COULD NOT REGISTER");
         req.session.error = 'That username is already in use, please try a different one.'; //inform user could not log them in
+        done(null, user);
+      }
+    })
+    .fail(function (err){
+      console.log(err.body);
+    });
+  }
+));
+
+passport.use(new GoogleStrategy(
+  {
+    clientID        : config.googleAuth.clientID,
+    clientSecret    : config.googleAuth.clientSecret,
+    callbackURL     : config.googleAuth.callbackURL,
+  },
+  function(token, refreshToken, profile, done) {
+    funct.googleAuth(profile)
+    .then(function (user) {
+      if (user) {
+        console.log("LOGGED IN AS: " + user.username);
+        req.session.success = 'You are successfully logged in ' + user.username + '!';
+        done(null, user);
+      }
+      if (!user) {
+        console.log("COULD NOT LOG IN");
+        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
         done(null, user);
       }
     })
@@ -185,6 +211,21 @@ app.get('/logout', function(req, res){
   req.session.notice = "You have successfully been logged out " + name + "!";
 });
 
+// =====================================
+// GOOGLE ROUTES =======================
+// =====================================
+// send to google to do the authentication
+// profile gets us their basic information including their name
+// email gets their emails
+app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+// the callback after google has authenticated the user
+app.get('/auth/google/callback',
+  passport.authenticate('google', {
+          successRedirect : '/profile',
+          failureRedirect : '/'
+  })
+);
 
 //===============socket.io============
 

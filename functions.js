@@ -12,8 +12,7 @@ var User = function(){
 		"password": '',
 		"avatar": '',
 		"google": {
-			"id": 'busca',
-			"token": '',
+			"id": '',
 			"name": '',
 			"email": ''
 		}		
@@ -37,7 +36,6 @@ exports.localReg = function (username, password) {
     deferred.resolve(false); //username already exists
   })
   .fail(function (result) {//case in which user does not already exist in db
-      console.log(result.body);
       if (result.body.message == 'The requested items could not be found.'){
         console.log('Username is free for use');
         db.put('local-users', username, user)
@@ -88,26 +86,45 @@ exports.localAuth = function (username, password) {
   return deferred.promise;
 };
 
-
 exports.googleAuth = function (profile) {
-  var deferred = Q.defer();
+	var deferred = Q.defer();
 
-  db.get('local-users', "query=google.id==busca")
-  .then(function (result){
-    console.log("FOUND USER " + result.body.username);
-    deferred.resolve(result.body);
-  }).fail(function (err){
-    if (err.body.message == 'The requested items could not be found.'){
-          console.log("COULD NOT FIND USER IN DB FOR SIGNIN");
-          deferred.resolve(false);
-    } else {
-      console.log('ERROR: ' + err)
-      deferred.reject(new Error(err));
-    }
-  });
+	db.search('local-users', "google.id==" + profile.id)
+	.then(function (result){
+		if(result.body.results.length){
+		    console.log("FOUND USER " + result.body.results[0].value.username);
+		    deferred.resolve(result.body.results[0].value);
+		}
+		else{
+			var user = new User()
+			var data = profile._json;
 
-  return deferred.promise;
-}
+			user.username = data.email;
+			user.password = '';
+			user.avatar = data.picture;
+			user.google.id = data.id;
+			user.google.name = data.name;
+			user.google.email = data.email;
+
+			console.log('USER NOT FOUND, go create a new one ' + JSON.stringify(user));
+		    db.put('local-users', data.email, user )
+		    .then(function () {
+		      console.log("USER: " + user);
+		      deferred.resolve(user);
+		    })
+		    .fail(function (err) {
+		      console.log("PUT FAIL:" + err);
+		      deferred.reject(new Error(err));
+		    });
+		}
+	})
+	.fail(function (err){
+		console.log("Search Fail " + JSON.stringify(err));
+		deferred.reject(new Error(err));
+	});
+
+	return deferred.promise;
+};
             /*
             User.findOne({ 'google.id' : profile.id }, function(err, user) {
                 if (err)

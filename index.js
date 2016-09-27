@@ -73,7 +73,7 @@ passport.use('local-signin', new LocalStrategy(
       }
     })
     .fail(function (err){
-      console.log(err.body);
+      console.log("ERROR signin: " + JSON.stringify(err));
     });
   }
 ));
@@ -96,33 +96,34 @@ passport.use('local-signup', new LocalStrategy(
       }
     })
     .fail(function (err){
-      console.log(err.body);
+      console.log("ERROR signup: " + JSON.stringify(err));
     });
   }
 ));
 
 passport.use(new GoogleStrategy(
   {
+    passReqToCallback : true,
     clientID        : config.googleAuth.clientID,
     clientSecret    : config.googleAuth.clientSecret,
     callbackURL     : config.googleAuth.callbackURL,
   },
-  function(token, refreshToken, profile, done) {
+  function(req, token, refreshToken, profile, done) {
     funct.googleAuth(profile)
     .then(function (user) {
       if (user) {
-        console.log("LOGGED IN AS: " + user.username);
+        console.log("LOGGED IN GOOGLE AS: " + user.username);
         req.session.success = 'You are successfully logged in ' + user.username + '!';
         done(null, user);
       }
       if (!user) {
-        console.log("COULD NOT LOG IN");
+        console.log("COULD NOT LOG IN GOOGLE");
         req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
         done(null, user);
       }
     })
     .fail(function (err){
-      console.log(err.body);
+      console.log("ERROR googleAuth: " + JSON.stringify(err));
     });
   }
 ));
@@ -222,8 +223,9 @@ app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'e
 // the callback after google has authenticated the user
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-          successRedirect : '/profile',
-          failureRedirect : '/'
+    scope : ['profile'],
+    successRedirect : '/',
+    failureRedirect : '/signin'
   })
 );
 

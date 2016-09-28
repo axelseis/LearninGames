@@ -1,31 +1,4 @@
-/*
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
 
-app.set('port', (process.env.PORT || 5000));
-
-app.get('/', function(request, response) {
-  response.sendFile(__dirname + '/index.html');
-  //response.render('pages/index');
-});
-
-io.on('connection', function(socket){
-  console.log('a user connected');
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-  socket.on('chat message', function(msg){
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);
-  });
-});
-
-http.listen(app.get('port'), function() {
-  console.log('Node app is running on port num ', app.get('port'));
-});
-
- */
 
 
 var express = require('express'),
@@ -37,7 +10,6 @@ var express = require('express'),
     session = require('express-session'),
     passport = require('passport'),
     LocalStrategy = require('passport-local'),
-    //TwitterStrategy = require('passport-twitter'),
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     FacebookStrategy = require('passport-facebook'),
     socketIO = require('socket.io');
@@ -124,6 +96,34 @@ passport.use(new GoogleStrategy(
     })
     .fail(function (err){
       console.log("ERROR googleAuth: " + JSON.stringify(err));
+    });
+  }
+));
+
+passport.use(new FacebookStrategy(
+  {
+    passReqToCallback : true,
+    clientID        : config.facebookAuth.clientID,
+    clientSecret    : config.facebookAuth.clientSecret,
+    callbackURL     : config.facebookAuth.callbackURL,
+    profileFields: ['id', 'email', 'picture', 'displayName']
+  },
+  function(req, token, refreshToken, profile, done) {
+    funct.facebookAuth(profile)
+    .then(function (user) {
+      if (user) {
+        console.log("LOGGED IN FACEBOOK AS: " + user.username);
+        req.session.success = 'You are successfully logged in ' + user.username + '!';
+        done(null, user);
+      }
+      if (!user) {
+        console.log("COULD NOT LOG IN GOOGLE");
+        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
+        done(null, user);
+      }
+    })
+    .fail(function (err){
+      console.log("ERROR facebookAuth: " + JSON.stringify(err));
     });
   }
 ));
@@ -215,15 +215,25 @@ app.get('/logout', function(req, res){
 // =====================================
 // GOOGLE ROUTES =======================
 // =====================================
-// send to google to do the authentication
-// profile gets us their basic information including their name
-// email gets their emails
 app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
 
 // the callback after google has authenticated the user
 app.get('/auth/google/callback',
   passport.authenticate('google', {
     scope : ['profile'],
+    successRedirect : '/',
+    failureRedirect : '/signin'
+  })
+);
+
+// =====================================
+// FACEBOOK ROUTES =====================
+// =====================================
+app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['email'] }));
+
+// the callback after google has authenticated the user
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', {
     successRedirect : '/',
     failureRedirect : '/signin'
   })

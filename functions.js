@@ -15,6 +15,11 @@ var User = function(){
 			"id": '',
 			"name": '',
 			"email": ''
+		},		
+		"facebook": {
+			"id": '',
+			"name": '',
+			"email": ''
 		}		
 	}
 };
@@ -125,31 +130,42 @@ exports.googleAuth = function (profile) {
 
 	return deferred.promise;
 };
-            /*
-            User.findOne({ 'google.id' : profile.id }, function(err, user) {
-                if (err)
-                    return done(err);
 
-                if (user) {
+exports.facebookAuth = function (profile) {
+	var deferred = Q.defer();
 
-                    // if a user is found, log them in
-                    return done(null, user);
-                } else {
-                    // if the user isnt in our database, create a new user
-                    var newUser          = new User();
+	db.search('local-users', "facebook.id==" + profile.id)
+	.then(function (result){
+		if(result.body.results.length){
+		    console.log("FOUND USER " + result.body.results[0].value.username);
+		    deferred.resolve(result.body.results[0].value);
+		}
+		else{
+			var user = new User()
 
-                    // set all of the relevant information
-                    newUser.google.id    = profile.id;
-                    newUser.google.token = token;
-                    newUser.google.name  = profile.displayName;
-                    newUser.google.email = profile.emails[0].value; // pull the first email
+			user.username = profile.emails[0].value;
+			user.password = '';
+			user.avatar = profile.photos[0].value;
+			user.facebook.id = profile.id;
+			user.facebook.name = profile.displayName;
+			user.facebook.email = profile.emails[0].value;
 
-                    // save the user
-                    newUser.save(function(err) {
-                        if (err)
-                            throw err;
-                        return done(null, newUser);
-                    });
-                }
-            });
-            */
+			console.log('USER NOT FOUND, go create a new one ' + JSON.stringify(user));
+		    db.put('local-users', user.username, user )
+		    .then(function () {
+		      console.log("USER: " + user);
+		      deferred.resolve(user);
+		    })
+		    .fail(function (err) {
+		      console.log("PUT FAIL:" + err);
+		      deferred.reject(new Error(err));
+		    });
+		}
+	})
+	.fail(function (err){
+		console.log("Search Fail " + JSON.stringify(err));
+		deferred.reject(new Error(err));
+	});
+
+	return deferred.promise;
+};

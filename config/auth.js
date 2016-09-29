@@ -2,8 +2,6 @@
 
 
 module.exports = {
-  	"db": "bb7af0df-3c53-4c9c-b074-54689e372bb6",
-
 	'facebookAuth' : {
 	    'clientID'      : '1462658537094213',
 	    'clientSecret'  : 'a395c3df6c69ebec2ed063d7857dc017',

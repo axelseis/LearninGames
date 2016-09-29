@@ -3,28 +3,10 @@
 
 var bcrypt = require('bcryptjs'),
     Q = require('q'),
-    config = require('./config.js'), //config file contains all tokens and other private info
-    db = require('orchestrate')(config.db); //config.db holds Orchestrate token
+    configDB = require('./database.js'),
+    db = require('orchestrate')(configDB.db),
+    User = require('./models/user.js').User;
 
-var User = function(){
-	return {
-		"username": '',
-		"password": '',
-		"avatar": '',
-		"google": {
-			"id": '',
-			"name": '',
-			"email": ''
-		},		
-		"facebook": {
-			"id": '',
-			"name": '',
-			"email": ''
-		}		
-	}
-};
-
-//used in local-signup strategy
 exports.localReg = function (username, password) {
   var deferred = Q.defer();
   var hash = bcrypt.hashSync(password, 8);
@@ -60,10 +42,6 @@ exports.localReg = function (username, password) {
   return deferred.promise;
 };
 
-//check if user exists
-    //if user exists check if passwords match (use bcrypt.compareSync(password, hash); // true where 'hash' is password in DB)
-      //if password matches take into website
-  //if user doesn't exist or password doesn't match tell them it failed
 exports.localAuth = function (username, password) {
   var deferred = Q.defer();
 

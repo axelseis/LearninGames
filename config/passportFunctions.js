@@ -5,12 +5,11 @@ var bcrypt = require('bcryptjs'),
     Q = require('q'),
     configDB = require('./database.js'),
     db = require('orchestrate')(configDB.db),
-    User = require('./models/user.js').User;
+    models = require('./models.js');
 
-exports.localReg = function (username, password) {
-  var deferred = Q.defer();
+localReg = function (deferred, username, password) {
   var hash = bcrypt.hashSync(password, 8);
-  var user = new User()
+  var user = new models.User()
 
   user.username = username;
   user.password = hash;
@@ -18,11 +17,11 @@ exports.localReg = function (username, password) {
 
   //check if username is already assigned in our database
   db.get('local-users', username)
-  .then(function (result){ //case in which user already exists in db
+  .then(function (result){ 
     console.log('username already exists');
-    deferred.resolve(false); //username already exists
+    deferred.resolve(false); 
   })
-  .fail(function (result) {//case in which user does not already exist in db
+  .fail(function (result) {
       if (result.body.message == 'The requested items could not be found.'){
         console.log('Username is free for use');
         db.put('local-users', username, user)
@@ -31,7 +30,7 @@ exports.localReg = function (username, password) {
           deferred.resolve(user);
         })
         .fail(function (err) {
-          console.log("PUT FAIL:" + err.body);
+          console.log("PUT FAIL:" + JSON.stringify(err));
           deferred.reject(new Error(err.body));
         });
       } else {
@@ -39,7 +38,7 @@ exports.localReg = function (username, password) {
       }
   });
 
-  return deferred.promise;
+  return deferred;
 };
 
 exports.localAuth = function (username, password) {
@@ -58,15 +57,24 @@ exports.localAuth = function (username, password) {
       deferred.resolve(false);
     }
   }).fail(function (err){
+    console.log('error: ' + JSON.stringify(err))
     if (err.body.message == 'The requested items could not be found.'){
-          console.log("COULD NOT FIND USER IN DB FOR SIGNIN");
-          deferred.resolve(false);
+      console.log("COULD NOT FIND USER IN DB FOR SIGNIN");
+      deferred = localReg(deferred, username, password);
     } else {
       deferred.reject(new Error(err));
     }
   });
 
   return deferred.promise;
+};
+
+exports.testAuth = function (user,done) {
+  var user = new models.User();
+  user.username = 'testuser';
+  user.avatar = "https://api.adorable.io/avatars/285/" + user.username + "@learningames.png";
+  console.log('usertest: ' + user);
+  done(null, user);
 };
 
 exports.googleAuth = function (profile) {
@@ -79,7 +87,7 @@ exports.googleAuth = function (profile) {
 		    deferred.resolve(result.body.results[0].value);
 		}
 		else{
-			var user = new User()
+			var user = new models.User()
 			var data = profile._json;
 
 			user.username = data.email;

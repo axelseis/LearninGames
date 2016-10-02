@@ -12,7 +12,7 @@ var express = require('express'),
     socketIO = require('socket.io');
 
 var app = express();
-var port = process.env.PORT || 5000; //select your port or let it pull from your .env file
+var port = process.env.PORT || 5000;
 var server = app.listen(port);
 var io = socketIO.listen(server);
 
@@ -28,11 +28,12 @@ require('./config/passport')(passport);
 
 // Configure Express
 app.use(logger('combined'));
+app.use(express.static('public'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride('X-HTTP-Method-Override'));
-app.use(session({secret: 'supernova', saveUninitialized: true, resave: true}));
+app.use(session({secret: 'hateosca', saveUninitialized: true, resave: true}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -63,19 +64,12 @@ app.set('view engine', 'handlebars');
 
 //===============ROUTES===============
 
-require('./app/routes.js')(app, passport);
+require('./routes.js')(app, passport);
 
 
-//===============socket.io============
+//===============GAMES===============
 
-io.on('connection', function(socket){
-  console.log('a user connected');
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-  socket.on('chat message', function(msg){
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);
-  });
-});
+require('./game.js')(app, io);
+
+
 

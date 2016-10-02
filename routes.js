@@ -1,6 +1,15 @@
 
 
 
+function isLoggedIn(req, res, next) {
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated())
+        return next()
+
+    // if they aren't redirect them to the home page
+    res.redirect("/")
+}
+
 //===============ROUTES===============
 module.exports = function(app, passport){
 
@@ -9,22 +18,31 @@ module.exports = function(app, passport){
 	  res.render('home', {user: req.user});
 	});
 
+	/*
 	//displays our signup page
 	app.get('/signin', function(req, res){
 	  res.render('signin');
 	});
+	*/
 
 	//sends the request through our local signup strategy, and if successful takes user to homepage, otherwise returns then to signin page
 	app.post('/local-reg', passport.authenticate('local-signup', {
-	  successRedirect: '/',
+	  successRedirect: '/games',
 	  failureRedirect: '/signin'
 	  })
 	);
 
 	//sends the request through our local login/signin strategy, and if successful takes user to homepage, otherwise returns then to signin page
 	app.post('/login', passport.authenticate('local-signin', {
-	  successRedirect: '/',
-	  failureRedirect: '/signin'
+	  successRedirect: '/games',
+	  failureRedirect: '/'
+	  })
+	);
+
+	//TEST
+	app.get('/test', passport.authenticate('test-login', {
+	  successRedirect: '/games',
+	  failureRedirect: '/'
 	  })
 	);
 
@@ -33,8 +51,8 @@ module.exports = function(app, passport){
 	  var name = req.user.username;
 	  console.log("LOGGIN OUT " + req.user.username)
 	  req.logout();
-	  res.redirect('/');
 	  req.session.notice = "You have successfully been logged out " + name + "!";
+	  res.redirect('/');
 	});
 
 	// =====================================
@@ -46,8 +64,8 @@ module.exports = function(app, passport){
 	app.get('/auth/google/callback',
 	  passport.authenticate('google', {
 	    scope : ['profile'],
-	    successRedirect : '/',
-	    failureRedirect : '/signin'
+	    successRedirect : '/games',
+	    failureRedirect : '/'
 	  })
 	);
 
@@ -59,17 +77,23 @@ module.exports = function(app, passport){
 	// the callback after google has authenticated the user
 	app.get('/auth/facebook/callback',
 	  passport.authenticate('facebook', {
-	    successRedirect : '/',
-	    failureRedirect : '/signin'
+	    successRedirect : '/games',
+	    failureRedirect : '/'
 	  })
 	);
 
 	// =====================================
-	//GAMES ROUTES
+	// GAMES ROUTES
 	// =====================================
 
+	app.get('/games', isLoggedIn, function(req, res){
+	  res.locals.ingame = null;
+	  res.render('games', {user: req.user});
+	});
+
 	//missing letter
-	app.get('/game', function(req, res){
-	  res.render('missingletter', {user: req.user});
+	app.get('/missingletter', isLoggedIn, function(req, res){
+	  res.locals.ingame = 'MissingLet_er';
+	  res.render('missinglet_er', {user: req.user});
 	});
 }

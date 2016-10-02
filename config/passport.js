@@ -4,10 +4,13 @@
 var LocalStrategy = require('passport-local'),
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     FacebookStrategy = require('passport-facebook'),
+    MockStrategy = require('./strategyMock.js'),
     config = require('./auth.js'), 
     funct = require('./passportFunctions.js');
 
 module.exports = function(passport) {
+
+	passport.use('test-login', new MockStrategy({passReqToCallback : true}, funct.testAuth));
 
 	passport.use('local-signin', new LocalStrategy(
 	  {passReqToCallback : true}, 
@@ -21,7 +24,7 @@ module.exports = function(passport) {
 	      }
 	      if (!user) {
 	        console.log("COULD NOT LOG IN");
-	        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
+	        req.session.error = 'Could not log user in. Please try again.'; 
 	        done(null, user);
 	      }
 	    })
@@ -31,6 +34,7 @@ module.exports = function(passport) {
 	  }
 	));
 
+	/*
 	passport.use('local-signup', new LocalStrategy(
 	  {passReqToCallback : true},
 	  function(req, username, password, done) {
@@ -52,6 +56,7 @@ module.exports = function(passport) {
 	    });
 	  }
 	));
+	*/
 
 	passport.use(new GoogleStrategy(
 	  {

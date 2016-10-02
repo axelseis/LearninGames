@@ -18,6 +18,13 @@ module.exports = function(app, passport){
 	  res.render('home', {user: req.user});
 	});
 
+	//TEST
+	app.get('/test', passport.authenticate('test-login', {
+	  successRedirect: '/games/missinglet_er',
+	  failureRedirect: '/'
+	  })
+	);
+
 	/*
 	//displays our signup page
 	app.get('/signin', function(req, res){
@@ -34,13 +41,6 @@ module.exports = function(app, passport){
 
 	//sends the request through our local login/signin strategy, and if successful takes user to homepage, otherwise returns then to signin page
 	app.post('/login', passport.authenticate('local-signin', {
-	  successRedirect: '/games',
-	  failureRedirect: '/'
-	  })
-	);
-
-	//TEST
-	app.get('/test', passport.authenticate('test-login', {
 	  successRedirect: '/games',
 	  failureRedirect: '/'
 	  })
@@ -92,8 +92,19 @@ module.exports = function(app, passport){
 	});
 
 	//missing letter
-	app.get('/missingletter', isLoggedIn, function(req, res){
+	app.get('/games/missinglet_er', isLoggedIn, function(req, res){
 	  res.locals.ingame = 'MissingLet_er';
 	  res.render('missinglet_er', {user: req.user});
 	});
+
+
+	// =====================================
+	// 404
+	// =====================================
+
+	app.get('*', isLoggedIn, function(req,res){
+		res.redirect('/games');
+	});
+
+
 }

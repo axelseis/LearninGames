@@ -69,9 +69,10 @@ exports.localAuth = function (username, password) {
   return deferred.promise;
 };
 
+var testNum = 0;
 exports.testAuth = function (user,done) {
   var user = new models.User();
-  user.username = 'testuser';
+  user.username = 'testuser_' + testNum++;
   user.avatar = "https://api.adorable.io/avatars/285/" + user.username + "@learningames.png";
   console.log('usertest: ' + user);
   done(null, user);

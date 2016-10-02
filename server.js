@@ -7,7 +7,8 @@ var express = require('express'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
-    session = require('express-session'),
+    //session = require('express-session'),
+    session = require('cookie-session'),
     passport = require('passport'),
     socketIO = require('socket.io');
 

@@ -2,21 +2,51 @@
 
 
   <!-- views/missinlet_er.handlebars -->
-  <div class="container page">
-    
+  <div class="gamecontainer">
+    <!--<canvas class="gamecanvas"></canvas>--> 
   </div>
   <footer class="footer">
     <img src="{{user.avatar}}"/>      
   </footer>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://unpkg.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>
   <script>
     var socket = io();
-    $('form').submit(function(){
-      socket.emit('chat message', $('#m').val());
-      $('#m').val('');
-      return false;
+    var myplayer = {
+      'id': '',
+      'avatar': '{{user.avatar}}'
+    }
+    var players = [];
+    var gamecontainer;
+
+    socket.on('connect', function(){
+      console.log('connect: ', this);
+      myplayer.id = this.id;
+      socket.emit('newPlayer', myplayer);
     });
-    socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
+
+    socket.on('enterGame', function(initPlayers){
+      gamecontainer = $('.gamecontainer');
+      players = initPlayers;
+
+      console.log('enterGame: ', players);
+      for (var i = 0; i < players.length; i++) {
+        gamecontainer.append('<div class="player" id="' + players[i].id + '"><img src="' + players[i].avatar + '" /></div>');
+      }
+      //gamecontainer.isotope();
     });
-  </script>  
+
+    socket.on('newPlayer', function(player){
+      players.push(player);
+      gamecontainer.append('<div class="player" id="' + player.id + '"><img src="' + player.avatar + '" /></div>');
+      console.log('newPlayer: ', players);
+    });
+
+    socket.on('removePlayer', function(playerId){
+      players = players.filter(function(player) {
+        return player.id != playerId;
+      });
+      $(".player[id='" + playerId + "']").remove();
+      console.log('removePlayer: ', players);
+    });
+  </script>

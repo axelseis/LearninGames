@@ -139,3 +139,15 @@ img.imageWord {
 .letters>.letter[sol="ko"] {
     background-color: red;
 }
+
+.time {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px;
+    font-size: 3em;
+    width: 30%;
+    height: 50%;
+    /* background-color: antiquewhite; */
+    text-align: center;
+}

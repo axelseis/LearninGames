@@ -7,16 +7,15 @@
     <div class="wordModal">
       <img class="imageWord" src=""/>
       <div class="word"></div>
+      <div class="time"></div>
     </div>
     <!--<canvas class="gamecanvas"></canvas>--> 
   </div>
-  div.
   <footer class="footer">
     <img src="{{user.avatar}}"/>
     <div class="letters"></div>      
   </footer>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://unpkg.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>
+  <!--<script src="https://unpkg.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>-->
   <script>
     var socket = io();
     var myplayer = {
@@ -29,13 +28,13 @@
         imageWord,
         word,
         letters,
+        time,
         sol;
 
     sendSolution = function(letter){
-        console.log('letter', letter);
       $('.letter').off('click');
       socket.emit('playerSol', letter);      
-    }
+    };
 
     socket.on('connect', function(){
       playersContainer = $('.playersContainer');
@@ -43,6 +42,7 @@
       imageWord = $('.imageWord');
       word = $('.word');
       letters = $('.letters');
+      time = $('.time');
 
       playersContainer.empty();
       //wordModal.hide();
@@ -51,10 +51,15 @@
       socket.emit('newPlayer', myplayer);
     });
 
+    socket.on('timeTick', function(newTime){
+      time.html(newTime);
+      time.fitText(0.15);
+    });
+
     socket.on('newWord', function(newWord){
-        console.log('newWord', newWord);
         sol = newWord[1];
         word.html(newWord[0]);
+        word.fitText(0.5);
         imageWord.attr('src', '/images/' + newWord[0].replace('_',sol) + '.png');
 
         letters.empty();

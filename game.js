@@ -9,34 +9,49 @@ var words = [
 
 
 var players = [];
+var maxTime = 10;
+var winTime = 3;
 var actWord,
+    playersEnded,
+    timeTick,
+    timeLeft,
     solved;
 
 module.exports = function(app, io){
 	io.sockets.on("connection", onSocketConnection);
 
-  initGame = function(){
-    actWord = getRandomWord();
-    console.log('actWord', actWord);
-    solved = false;
-
-    io.sockets.emit('newWord',actWord);
-  };
-
-  endGame = function(playerId){
-    console.log('endGame', playerId);
-    solved = true;
-    io.sockets.emit('playerWins',playerId);
-    setTimeout(initGame,5000);
-  };
-
-  getRandomWord = function(){
+  newGame = function(){
     var wordN = Math.floor(Math.random()*words.length);
     var letterN = Math.floor(Math.random()*words[wordN][1].length);
     var filled = words[wordN][1].slice(0).splice(letterN+1,1).concat(words[wordN][2]).sort(function(){return 0.5 - Math.random()}).splice(0,4).concat(words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()});
     
-    return [words[wordN][0],words[wordN][1][letterN],filled];
+    actWord = [words[wordN][0],words[wordN][1][letterN],filled];
+    solved = false;
+    playersEnded = 0;
+    timeLeft = maxTime;
+
+    io.sockets.emit('newWord',actWord);
+
+    setTime();
+    if(!timeTick){
+      timeTick = setInterval(setTime,1000);
+    }
   };
+
+  playerWins = function(playerId){
+    console.log('playerWins', playerId);
+    solved = true;
+    timeLeft = winTime;
+    
+    io.sockets.emit('playerWins',playerId);
+  };
+
+  setTime = function(){
+    if(timeLeft < 0){
+      newGame();
+    }
+    io.sockets.emit('timeTick',timeLeft--);
+  }
 
   function onSocketConnection(client) {      //console.log('client', client);
     console.log("onSocketConnection: ", client.conn.id);
@@ -47,9 +62,10 @@ module.exports = function(app, io){
 
   function onPlayerSolution(solution) {
     console.log('onPlayerSolution', solution);
+
     if(solution == actWord[1]){
       if(!solved){
-        endGame(this.conn.id);
+        playerWins(this.conn.id);
       }
       else{
         io.sockets.emit('playerSol',[this.conn.id,'ok']);
@@ -57,6 +73,10 @@ module.exports = function(app, io){
     }
     else{
       io.sockets.emit('playerSol',[this.conn.id,'ko']);
+    }
+
+    if(playersEnded++ == players.length){
+      newGame();
     }
   };
 
@@ -68,7 +88,7 @@ module.exports = function(app, io){
     this.emit('enterGame', players);
 
     if(players.length == 1){
-      initGame();
+      newGame();
     }
     else{
       this.emit('newWord', actWord);      
@@ -86,5 +106,9 @@ module.exports = function(app, io){
       }
     }
     console.log('onClientDisconnect' + this.id + ' -> ' + players.length);
+
+    if(!players.length){
+      clearInterval(timeTick);
+    }
   };
 }

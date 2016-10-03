@@ -7,7 +7,6 @@ var words = [
   ['co_rse',['a','u'],['r','i','p']]
 ]
 
-
 var players = [];
 var maxTime = 10;
 var winTime = 3;

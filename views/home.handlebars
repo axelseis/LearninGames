@@ -7,7 +7,16 @@
     <h1>Please Enter</h1>
     <div class="span2">
       <a href="/auth/google" class="btn btn-danger btn-block" role="button"><span class="glyphicon glyphicon-user"></span> LogIn with Google</a>
+      
       <a href="/auth/facebook" class="btn btn-primary btn-block" role="button"><span class="glyphicon glyphicon-user"></span> LogIn with Facebook</a>
+
+      <a data-toggle="collapse" href="#videoCam" class="btn btn-warning btn-block" role="button"><span class="glyphicon glyphicon-user"></span> LogIn with Camera</a>
+      <div id="videoCam" class="collapse container btn-warning" >
+        <video class="camera" src=""></video>
+        <canvas id="canvas"></canvas>
+      </div>
+      
+      <!--
       <a data-toggle="collapse" href="#local" class="btn btn-warning btn-block" role="button"><span class="glyphicon glyphicon-user"></span> LogIn with Email</a>
       <form id="local" class="collapse container btn-warning" action="/login" method="post">
         <div class="form-group">
@@ -22,7 +31,72 @@
             <input type="submit" class="btn btn-primary btn-sm" value="Log In"/>
         </div>
       </form>
+      -->
     </div>
+    
+    <script>
+      var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+      var cameraStream;
+      var videObj = $('video');
+      var video = videObj.get(0);
+      var canvas = $('#canvas');
 
+      function initCapture(){
+        getUserMedia.call(navigator, {video: true}, 
+          function (stream) {
+            if (window.webkitURL) {
+                video.src = window.webkitURL.createObjectURL(stream);
+            } else {
+                video.src = stream;
+            }
+
+            cameraStream = stream;
+
+            video.play();
+            setTimeout(captureFace,2000);
+          },
+          function(error){
+            console.log('error: ', error);
+          }
+        );
+      }
+        
+      function captureFace(){
+        videObj.faceDetection({
+          interval: 1,
+          async: true,
+          complete: function (faces) {
+            console.log('scale: ' + videObj.scaleX)
+              console.log('video', video.videoWidth + '->'+ videObj.width());
+            if(!faces.length){
+              setTimeout(captureFace,1000);
+            }
+            else{
+              var face = faces[0];
+              var scaleX = video.videoWidth/videObj.width();
+              var scaleY = video.videoHeight/videObj.height();
+              var clip = [face.x, face.y, face.width, face.height]
+              //canvas.get(0).getContext('2d').drawImage(video, (face.positionX*face.scaleX)-10, (face.positionY*face.scaleY)-10, (face.width*face.scaleX)+20, (face.height**face.scaleY)+20);
+              canvas.get(0).getContext('2d').drawImage(video, clip[0],clip[1],clip[2],clip[3], 0, 0, clip[2], clip[3]);
+              $('<div>', {
+                            'class':'face-video',
+                            'css': {
+                                'left':   faces[0].x * faces[0].scaleX + 'px',
+                                'top':    faces[0].y * faces[0].scaleY + 'px',
+                                'width':  faces[0].width  * faces[0].scaleX + 'px',
+                                'height': faces[0].height * faces[0].scaleY + 'px'
+                            }
+                        })
+                        .insertAfter(this);
+            }
+            console.log('faces: ', faces[0]);
+          },
+          error: function(error){
+            console.log('error: ', error)
+          }
+        });
+      }
+      $('#videoCam').on('show.bs.collapse', initCapture)
+    </script>
   </div>
 </div>

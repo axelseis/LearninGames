@@ -6,14 +6,14 @@
     <div class="playersContainer"></div>
     <div class="wordModal">
       <img class="imageWord" src=""/>
-      <div class="word"></div>
-      <div class="time"></div>
+      <div class="word noselect"></div>
+      <div class="time noselect"></div>
     </div>
     <!--<canvas class="gamecanvas"></canvas>--> 
   </div>
   <footer class="footer">
     <img src="{{user.avatar}}"/>
-    <div class="letters"></div>      
+    <div class="letters noselect"></div>      
   </footer>
   <!--<script src="https://unpkg.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>-->
   <script>
@@ -29,7 +29,16 @@
         word,
         letters,
         time,
-        sol;
+        sol,
+        avatar;
+
+    playersContainer = $('.playersContainer');
+    wordModal = $('.wordModal');
+    imageWord = $('.imageWord');
+    word = $('.word');
+    letters = $('footer>div.letters');
+    time = $('.time');
+    avatar = $('footer>img')
 
     sendSolution = function(letter){
       $('.letter').off('click');
@@ -37,13 +46,6 @@
     };
 
     socket.on('connect', function(){
-      playersContainer = $('.playersContainer');
-      wordModal = $('.wordModal');
-      imageWord = $('.imageWord');
-      word = $('.word');
-      letters = $('.letters');
-      time = $('.time');
-
       playersContainer.empty();
       //wordModal.hide();
 
@@ -58,11 +60,14 @@
 
     socket.on('newWord', function(newWord){
         sol = newWord[1];
+        
         word.html(newWord[0]);
         word.fitText(0.5);
+        
         imageWord.attr('src', '/images/' + newWord[0].replace('_',sol) + '.png');
-
+        playersContainer.children('.player').removeAttr('sol');
         letters.empty();
+
         for (var i = 0; i < newWord[2].length; i++) {
           var newLetter = $('<div class="letter">' + newWord[2][i] + '</div>');
 
@@ -100,7 +105,11 @@
     });
 
     socket.on('playerWins', function(playerId){
-        playersContainer.prepend(playersContainer.children(".player[id='" + playerId + "']"));
+        var playerWin = playersContainer.children(".player[id='" + playerId + "']");
+
+        playerWin.attr('sol', 'ok');
+        playersContainer.prepend(playerWin);
+        
         if(playerId == myplayer.id){
           letters.children('.letter[sol]').attr('sol', 'ok');
         }
@@ -108,6 +117,9 @@
     });
 
     socket.on('playerSol', function(playerData){
+        var player = playersContainer.children(".player[id='" + playerData[0] + "']");
+        player.attr('sol', playerData[1]);
+
         if(playerData[0] == myplayer.id){
           letters.children('.letter[sol]').attr('sol', playerData[1]);
         }

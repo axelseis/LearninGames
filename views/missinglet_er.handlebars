@@ -2,11 +2,18 @@
 
 
   <!-- views/missinlet_er.handlebars -->
-  <div class="gamecontainer">
+  <div class="gameContainer">
+    <div class="playersContainer"></div>
+    <div class="wordModal">
+      <img class="imageWord" src=""/>
+      <div class="word"></div>
+    </div>
     <!--<canvas class="gamecanvas"></canvas>--> 
   </div>
+  div.
   <footer class="footer">
-    <img src="{{user.avatar}}"/>      
+    <img src="{{user.avatar}}"/>
+    <div class="letters"></div>      
   </footer>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://unpkg.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>
@@ -17,28 +24,65 @@
       'avatar': '{{user.avatar}}'
     }
     var players = [];
-    var gamecontainer;
+    var playersContainer,
+        wordModal,
+        imageWord,
+        word,
+        letters,
+        sol;
+
+    sendSolution = function(letter){
+        console.log('letter', letter);
+      $('.letter').off('click');
+      socket.emit('playerSol', letter);      
+    }
 
     socket.on('connect', function(){
-      console.log('connect: ', this);
+      playersContainer = $('.playersContainer');
+      wordModal = $('.wordModal');
+      imageWord = $('.imageWord');
+      word = $('.word');
+      letters = $('.letters');
+
+      playersContainer.empty();
+      //wordModal.hide();
+
       myplayer.id = this.id;
       socket.emit('newPlayer', myplayer);
     });
 
+    socket.on('newWord', function(newWord){
+        console.log('newWord', newWord);
+        sol = newWord[1];
+        word.html(newWord[0]);
+        imageWord.attr('src', '/images/' + newWord[0].replace('_',sol) + '.png');
+
+        letters.empty();
+        for (var i = 0; i < newWord[2].length; i++) {
+          var newLetter = $('<div class="letter">' + newWord[2][i] + '</div>');
+
+          newLetter.click(function(event) {
+              $(this).attr('sol', 'true');
+              sendSolution($(this).html());
+          });
+
+          letters.append(newLetter);
+        }
+    });
+
     socket.on('enterGame', function(initPlayers){
-      gamecontainer = $('.gamecontainer');
       players = initPlayers;
 
       console.log('enterGame: ', players);
       for (var i = 0; i < players.length; i++) {
-        gamecontainer.append('<div class="player" id="' + players[i].id + '"><img src="' + players[i].avatar + '" /></div>');
+        playersContainer.append('<div class="player" id="' + players[i].id + '"><img src="' + players[i].avatar + '" /></div>');
       }
-      //gamecontainer.isotope();
+      //playersContainer.isotope();
     });
 
     socket.on('newPlayer', function(player){
       players.push(player);
-      gamecontainer.append('<div class="player" id="' + player.id + '"><img src="' + player.avatar + '" /></div>');
+      playersContainer.append('<div class="player" id="' + player.id + '"><img src="' + player.avatar + '" /></div>');
       console.log('newPlayer: ', players);
     });
 
@@ -48,5 +92,20 @@
       });
       $(".player[id='" + playerId + "']").remove();
       console.log('removePlayer: ', players);
+    });
+
+    socket.on('playerWins', function(playerId){
+        playersContainer.prepend(playersContainer.children(".player[id='" + playerId + "']"));
+        if(playerId == myplayer.id){
+          letters.children('.letter[sol]').attr('sol', 'ok');
+        }
+        console.log('playerWins', playerId);
+    });
+
+    socket.on('playerSol', function(playerData){
+        if(playerData[0] == myplayer.id){
+          letters.children('.letter[sol]').attr('sol', playerData[1]);
+        }
+        console.log('playerSol', playerData);
     });
   </script>

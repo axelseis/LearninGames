@@ -178,3 +178,19 @@ video.camera {
     width: 100%;
     /* display: none; */
 }
+
+canvas#canvas {
+    /* width: 100px; */
+    /* height: 100px; */
+    position: fixed;
+    top: 60px;
+}
+
+div#marco {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 0;
+    left: 0;
+    border: 2px solid red;
+}

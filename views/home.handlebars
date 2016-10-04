@@ -35,17 +35,84 @@
     </div>
     
     <script>
-      var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-      var cameraStream;
+      var cameraStream, videoSource;
       var videObj = $('video');
       var video = videObj.get(0);
       var canvas = $('#canvas');
 
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+      if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
+        alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
+      } 
+      else {
+        MediaStreamTrack.getSources(gotSources);
+      }
+
+      $('#videoCam').on('show.bs.collapse', startCamera);
+
+      function gotSources(sourceInfos) {
+        for(var i = 0; i < sourceInfos.length; i++) {
+          var si = sourceInfos[i];
+          console.log('sourceInfo: ', si);
+          if(si.kind === 'video') {
+            videoSource = si.label || 'camera 1';
+            break;
+          }
+        }
+      }
+
+      function successCallback(stream) {
+        var url = window.webkitURL || window.URL;
+        window.stream = stream; // make stream available to console
+
+        if (url) {
+            video.src = url.createObjectURL(stream);
+        } else {
+            video.src = stream;
+        }
+
+        video.play();
+        setTimeout(captureFace,2000);
+      }
+
+      function errorCallback(error) {
+        console.log('navigator.getUserMedia error: ', error);
+      }
+
+      function startCamera() {
+        if (window.stream) {
+            console.log('window.stream', window.stream);
+          video.src = null;
+          //window.stream.stop();
+        }
+        var constraints = {
+          video: {
+            optional: [{
+              sourceId: videoSource
+            }]
+          }
+        };
+        navigator.getUserMedia(constraints, successCallback, errorCallback);
+      }
+      /*
       function initCapture(){
-        getUserMedia.call(navigator, {video: true}, 
+        if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
+          alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
+        } else {
+          MediaStreamTrack.getSources(gotSources);
+        }
+
+        getUserMedia.call(navigator, 
+          {video: {
+            optional: [{
+              sourceId: videoSource
+            }]
+          }}, 
           function (stream) {
-            if (window.webkitURL) {
-                video.src = window.webkitURL.createObjectURL(stream);
+            var url = window.webkitURL || window.URL;
+            if (url) {
+                video.src = url.createObjectURL(stream);
             } else {
                 video.src = stream;
             }
@@ -60,6 +127,7 @@
           }
         );
       }
+      */
         
       function captureFace(){
         videObj.faceDetection({
@@ -96,7 +164,6 @@
           }
         });
       }
-      $('#videoCam').on('show.bs.collapse', initCapture)
     </script>
   </div>
 </div>

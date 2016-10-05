@@ -3,8 +3,9 @@
 
 function isLoggedIn(req, res, next) {
     // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
+    if (req.isAuthenticated()){
         return next()
+    }
 
     // if they aren't redirect them to the home page
     res.redirect("/")
@@ -15,7 +16,12 @@ module.exports = function(app, passport){
 
 	//displays our homepage
 	app.get('/', function(req, res){
-	  res.render('home', {user: req.user});
+	    if (req.isAuthenticated()){
+		  	res.redirect('/games');
+	    }
+	  	else{  		
+		  	res.render('home', {user: req.user});
+	  	}
 	});
 
 	//TEST
@@ -25,6 +31,18 @@ module.exports = function(app, passport){
 	  })
 	);
 
+	//CAMERA
+	app.post('/cameraLogin', function(req, res, next) {
+	    passport.authenticate('camera-login', function(err, user, info) {
+	        if (err) { return next(err); }
+	        if (!user) { return res.json('ko'); }
+	        req.logIn(user, function(err) {
+	            if (err) { return next(err); }
+	            return res.json('ok');
+	        });
+	    })(req, res, next);
+	});
+	
 	/*
 	//displays our signup page
 	app.get('/signin', function(req, res){

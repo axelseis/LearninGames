@@ -31,7 +31,7 @@ require('./config/passport')(passport);
 app.use(logger('combined'));
 app.use(express.static('public'));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
 app.use(bodyParser.json());
 app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(session({secret: 'hateosca', saveUninitialized: true, resave: true}));

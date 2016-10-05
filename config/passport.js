@@ -5,12 +5,15 @@ var LocalStrategy = require('passport-local'),
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     FacebookStrategy = require('passport-facebook'),
     MockStrategy = require('./strategyMock.js'),
+    CameraStrategy = require('./strategyCamera.js'),
     config = require('./auth.js'), 
     funct = require('./passportFunctions.js');
 
 module.exports = function(passport) {
 
 	passport.use('test-login', new MockStrategy({passReqToCallback : true}, funct.testAuth));
+
+	passport.use('camera-login', new CameraStrategy({passReqToCallback : false}, funct.cameraAuth));
 
 	passport.use('local-signin', new LocalStrategy(
 	  {passReqToCallback : true}, 
@@ -115,12 +118,12 @@ module.exports = function(passport) {
 
 	// Passport session setup.
 	passport.serializeUser(function(user, done) {
-	  console.log("serializing " + user.username);
+	  console.log("serializing ", user);
 	  done(null, user);
 	});
 
 	passport.deserializeUser(function(obj, done) {
-	  console.log("deserializing " + obj);
+	  console.log("deserializing ", obj);
 	  done(null, obj);
 	});
 }

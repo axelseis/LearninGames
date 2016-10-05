@@ -15,6 +15,9 @@ exports.User = function(){
 			"id": '',
 			"name": '',
 			"email": ''
+		},
+		"camera": {
+			"avatar:": ''
 		}		
 	}
 };

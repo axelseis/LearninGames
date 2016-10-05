@@ -46,13 +46,11 @@ exports.localAuth = function (username, password) {
 
   db.get('local-users', username)
   .then(function (result){
-    console.log("FOUND USER");
     var hash = result.body.password;
-    console.log(hash);
-    console.log(bcrypt.compareSync(password, hash));
     if (bcrypt.compareSync(password, hash)) {
       deferred.resolve(result.body);
-    } else {
+    } 
+    else {
       console.log("PASSWORDS NOT MATCH");
       deferred.resolve(false);
     }
@@ -74,7 +72,17 @@ exports.testAuth = function (user,done) {
   var user = new models.User();
   user.username = 'testuser_' + testNum++;
   user.avatar = "https://api.adorable.io/avatars/285/" + user.username + "@learningames.png";
-  console.log('usertest: ' + user);
+  done(null, user);
+};
+
+exports.cameraAuth = function (user,done) {
+    console.log('user', user.username);
+  /*
+  var user = new models.User();
+  user.username = 'camerauser_' + cameraNum++;
+  user.avatar = user.avatar;
+  console.log('camerauser: ' + user);
+  */
   done(null, user);
 };
 

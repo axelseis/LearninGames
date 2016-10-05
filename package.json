@@ -27,8 +27,7 @@
     "passport-google-oauth": "^0.1.5",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.2",
-    "q": "^1.0.1",
-    "fs": "*" 
+    "q": "^1.0.1"
   },
   "keywords": [
     "node",

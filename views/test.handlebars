@@ -1,0 +1,44 @@
+
+
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script>
+	
+var words = [
+  ['bo_t',['a','l','i','u'],['f','b','n','s','e']],
+  ['station_ry',['a','e'],['d','i','y','o']],
+  ['co_rse',['a','u'],['r','i','p','o']],
+  ['con_ensus',['s'],['c','t','p','o']],
+  ['definit_ly',['e'],['y','h','a','r']],
+  ['separ_te',['a'],['y','r','e','i']]
+];
+
+this.lastWords = [];
+this.words = words;
+
+
+  _getRandomWord = function(){
+    var wordN = Math.floor(Math.random()*this.words.length);
+    console.log('this.lastWords', this.lastWords);
+    console.log('wordN', wordN);
+    while(this.lastWords.indexOf('w'+wordN) != -1){
+      wordN = Math.floor(Math.random()*this.words.length);
+      console.log('wordN', wordN);
+    }
+
+    var letterN = Math.floor(Math.random()*this.words[wordN][1].length);
+    var filled = this.words[wordN][1].slice(0).splice(letterN+1,1).concat(this.words[wordN][2]).sort(function(){return 0.5 - Math.random()}).splice(0,4).concat(this.words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()});
+
+    this.lastWords.push('w'+wordN);
+    if(this.lastWords.length > this.words.length/2){
+      this.lastWords.shift();
+    }
+
+    return [this.words[wordN][0],this.words[wordN][1][letterN],filled];
+  };
+
+  for (var i = 0; i < 100; i++) {
+  	console.log('_getRandomWord:', _getRandomWord());
+  }
+</script>
+

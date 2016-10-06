@@ -1,76 +1,78 @@
 
 
 
-var express = require('express'),
-    exphbs = require('express-handlebars'),
-    logger = require('morgan'),
-    cookieParser = require('cookie-parser'),
-    bodyParser = require('body-parser'),
-    methodOverride = require('method-override'),
-    //session = require('express-session'),
-    session = require('cookie-session'),
-    passport = require('passport'),
-    socketIO = require('socket.io');
+  var express = require('express'),
+      exphbs = require('express-handlebars'),
+      logger = require('morgan'),
+      cookieParser = require('cookie-parser'),
+      bodyParser = require('body-parser'),
+      methodOverride = require('method-override'),
+      //session = require('express-session'),
+      session = require('cookie-session'),
+      passport = require('passport'),
+      socketIO = require('socket.io');
 
-var app = express();
-var port = process.env.PORT || 5000;
-var server = app.listen(port);
-var io = socketIO.listen(server);
+  var app = express();
+  var port = process.env.PORT || 5000;
+  var server = app.listen(port);
+  var io = socketIO.listen(server);
 
-console.log("listening on " + port + "!");
+  console.log("listening on " + port + "!");
 
+  //===============PASSPORT===============
 
-//===============PASSPORT===============
-
-require('./config/passport')(passport);
-
-
-//===============EXPRESS================
-
-// Configure Express
-app.use(logger('combined'));
-app.use(express.static('public'));
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
-app.use(bodyParser.json());
-app.use(methodOverride('X-HTTP-Method-Override'));
-app.use(session({secret: 'hateosca', saveUninitialized: true, resave: true}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Session-persisted message middleware
-app.use(function(req, res, next){
-  var err = req.session.error,
-      msg = req.session.notice,
-      success = req.session.success;
-
-  delete req.session.error;
-  delete req.session.success;
-  delete req.session.notice;
-
-  if (err) res.locals.error = err;
-  if (msg) res.locals.notice = msg;
-  if (success) res.locals.success = success;
-
-  next();
-});
-
-// Configure express to use handlebars templates
-var hbs = exphbs.create({
-    defaultLayout: 'main', 
-});
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
+  require('./config/passport')(passport);
 
 
-//===============ROUTES===============
+  //===============EXPRESS================
 
-require('./routes.js')(app, passport);
+  // Configure Express
+  //app.use(logger('tiny'));
+  app.use(express.static('public'));
+  app.use(cookieParser());
+  app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
+  app.use(bodyParser.json());
+  app.use(methodOverride('X-HTTP-Method-Override'));
+  app.use(session({secret: 'hateosca', saveUninitialized: true, resave: true}));
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  // Session-persisted message middleware
+  app.use(function(req, res, next){
+    var err = req.session.error,
+        msg = req.session.notice,
+        success = req.session.success;
+
+    delete req.session.error;
+    delete req.session.success;
+    delete req.session.notice;
+
+    if (err) res.locals.error = err;
+    if (msg) res.locals.notice = msg;
+    if (success) res.locals.success = success;
+
+    next();
+  });
+
+  // Configure express to use handlebars templates
+  var hbs = exphbs.create({
+      defaultLayout: 'main', 
+  });
+  app.engine('handlebars', hbs.engine);
+  app.set('view engine', 'handlebars');
 
 
-//===============GAMES===============
+  //===============ROUTES===============
 
-require('./game.js')(app, io);
+  require('./config/routes.js')(app, passport);
+
+
+  //===============GAMES===============
+  //MissingLet_er
+  var missingletter = require('./games/missinglet_er.js');
+  //var missingletter = new Ml(io);
+  
+  missingletter.init(io);
 
 
 

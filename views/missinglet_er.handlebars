@@ -15,9 +15,16 @@
     <img src="{{user.avatar}}"/>
     <div class="letters noselect"></div>      
   </footer>
-  <!--<script src="https://unpkg.com/isotope-layout@3.0/dist/isotope.pkgd.min.js"></script>-->
+
   <script>
-    var socket = io();
+
+    var game = new LGClient.Games.MissingLetter('{{user.avatar}}');
+    game.init();
+    /*
+    //game.
+    return;
+
+    var socket = io('/missinglet_er');
     var myplayer = {
       'id': '',
       'avatar': '{{user.avatar}}'
@@ -81,6 +88,7 @@
     });
 
     socket.on('enterGame', function(initPlayers){
+        console.log('initPlayers', initPlayers);
       players = initPlayers;
 
       console.log('enterGame: ', players);
@@ -91,6 +99,7 @@
     });
 
     socket.on('newPlayer', function(player){
+        console.log('newPlayer: ', player);
       players.push(player);
       playersContainer.append('<div class="player" id="' + player.id + '"><img src="' + player.avatar + '" /></div>');
       console.log('newPlayer: ', players);
@@ -125,4 +134,5 @@
         }
         console.log('playerSol', playerData);
     });
+    */
   </script>

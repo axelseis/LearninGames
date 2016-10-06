@@ -24,12 +24,17 @@ module.exports = function(app, passport){
 	  	}
 	});
 
+	/*
 	//TEST
 	app.get('/test', passport.authenticate('test-login', {
 	  successRedirect: '/games/missinglet_er',
 	  failureRedirect: '/'
 	  })
 	);
+	*/
+	app.get('/test', function(req, res){
+		res.render('test',{layout: false});
+	 });
 
 	//CAMERA
 	app.post('/cameraLogin', function(req, res, next) {
@@ -68,6 +73,7 @@ module.exports = function(app, passport){
 	app.get('/logout', function(req, res){
 	  var name = req.user.username;
 	  console.log("LOGGIN OUT " + req.user.username)
+	  
 	  req.logout();
 	  req.session.notice = "You have successfully been logged out " + name + "!";
 	  res.redirect('/');

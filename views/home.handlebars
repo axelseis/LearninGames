@@ -55,7 +55,19 @@
   else {
     navigator.mediaDevices.enumerateDevices(gotSources);
   }
-
+  $('a').on(click(function(event) {
+    var body = document.documentElement;
+    if (body.requestFullscreen) {
+      body.requestFullscreen();
+    } else if (body.webkitrequestFullscreen) {
+      body.webkitrequestFullscreen();
+    } else if (body.mozrequestFullscreen) {
+      body.mozrequestFullscreen();
+    } else if (body.msrequestFullscreen) {
+      body.msrequestFullscreen();
+    }  
+  }));
+  
   $('#videoCam').on('shown.bs.collapse', startCamera);
   $('#videoCam').on('hidden.bs.collapse', stopCamera);
 

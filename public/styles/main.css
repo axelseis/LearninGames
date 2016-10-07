@@ -255,3 +255,8 @@ div#overlay {
     cursor: pointer;
 }
 
+
+
+.letters>.letter:nth-child(2n) {
+  background-color: #d0d0d0;
+}

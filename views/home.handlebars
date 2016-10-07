@@ -31,7 +31,6 @@
 <canvas id="canvas"></canvas>
 <div id="marco"></div>
 
-
 <script>
   var cameraStream, 
       videoSource, 
@@ -45,8 +44,6 @@
   var canvas = $('#canvas');
   var marco = $('#marco');
 
-  var kairos = new Kairos("718f44d1", "28c7adf1ebe94442503a0559c506d819");
-
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
   if (typeof navigator.mediaDevices === 'undefined' || typeof navigator.mediaDevices.enumerateDevices === 'undefined') {
@@ -55,7 +52,7 @@
   else {
     navigator.mediaDevices.enumerateDevices(gotSources);
   }
-  
+
   $('#videoCam').on('shown.bs.collapse', startCamera);
   $('#videoCam').on('hidden.bs.collapse', stopCamera);
 

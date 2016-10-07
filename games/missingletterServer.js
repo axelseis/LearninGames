@@ -104,14 +104,14 @@ Game.prototype = {
   _newGame: function(){
     var newWord = this._getRandomWord();
 
-    this.solved = false;
-    this.playersEnded = 0;
     this.actWord = newWord[0];
     this.actSol = newWord[1];
-    this.timeLeft = this.maxTime;
 
     this.gameIO.emit('newWord',this.actWord);
 
+    this.solved = false;
+    this.playersEnded = 0;
+    this.timeLeft = this.maxTime;
     this._setTime();
 
     if(!this.timeTick){
@@ -127,11 +127,15 @@ Game.prototype = {
   },
 
   _setTime: function(){
+    var sendSol = false;
+
     if(this.timeLeft < 0){
       this._newGame();
     }
-    
-    this.gameIO.emit('timeTick',this.timeLeft--);
+    else if(this.timeLeft == 0){
+      sendSol = this.actSol;
+    }
+    this.gameIO.emit('timeTick', this.timeLeft--, sendSol);
   },
 
   init: function(io){

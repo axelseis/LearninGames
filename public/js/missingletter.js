@@ -12,7 +12,6 @@
       var _api = {
 
         _initSocketEvents: function(){
-          console.log('LGamesClient.Game._initSocketEvents', LGamesClient.Game);
           LGamesClient.Game.prototype._initSocketEvents.call(this);
           
           this.socket.on('timeTick', this._onTimeTick.bind(this));
@@ -24,13 +23,18 @@
           this.socket.on('playerSol', this._onPlayerSol.bind(this));
         },
 
-        _onTimeTick: function(newTime){
+        _onTimeTick: function(newTime,showSol){
           this.time.html(newTime);
           this.time.fitText(0.15);
+
+          if(showSol){
+          	this.word.html(this.word.html().replace('_','<span class="sol">' + showSol + '</span>'));
+          }
         },
 
         _onClickLetter: function(event) {
 			var letter = $(event.currentTarget);
+
 			letter.attr('sol', 'true');
 			this._sendSolution(letter.html());
 		},

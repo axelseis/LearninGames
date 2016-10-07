@@ -125,6 +125,10 @@ canvas.gamecanvas {
     height: 50%;
 }
 
+.wordModal>.word>.sol{
+  color: green;
+}
+
 .letters {
     position: absolute;
     left: 80px;

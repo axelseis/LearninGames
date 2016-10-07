@@ -5,7 +5,9 @@
 <div class="container vertical-center">
   <div class="container text-center">
     <h1>Please Enter</h1>
+
     <div class="span2">
+
       <a href="/auth/google" class="btn btn-danger btn-block" role="button">
         <span class="glyphicon glyphicon-user"></span> LogIn with Google
       </a>
@@ -21,26 +23,11 @@
         <video class="camera" src=""></video>
       </div>      
 
-      <!--
-      <a data-toggle="collapse" href="#local" class="btn btn-warning btn-block" role="button"><span class="glyphicon glyphicon-user"></span> LogIn with Email</a>
-      <form id="local" class="collapse container btn-warning" action="/login" method="post">
-        <div class="form-group">
-          <label for="username">Email address</label>
-          <input type="email" class="form-control" name="username" placeholder="Email">
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" class="form-control" name="password" placeholder="Password">
-        </div>
-        <div>
-            <input type="submit" class="btn btn-primary btn-sm" value="Log In"/>
-        </div>
-      </form>
-      -->
     </div>
 
   </div>
 </div>
+
 <canvas id="canvas"></canvas>
 <div id="marco"></div>
 
@@ -51,6 +38,8 @@
       detector,
       detections;
 
+  var mindetections = 15;
+
   var videObj = $('video');
   var video = videObj.get(0);
   var canvas = $('#canvas');
@@ -60,11 +49,11 @@
 
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-  if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
-    alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
+  if (typeof navigator.mediaDevices === 'undefined' || typeof navigator.mediaDevices.enumerateDevices === 'undefined') {
+    //alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
   } 
   else {
-    MediaStreamTrack.getSources(gotSources);
+    navigator.mediaDevices.enumerateDevices(gotSources);
   }
 
   $('#videoCam').on('shown.bs.collapse', startCamera);
@@ -81,7 +70,7 @@
     for(var i = 0; i < sourceInfos.length; i++) {
       var si = sourceInfos[i];
 
-      if(si.kind === 'video') {
+      if(si.kind === 'videoinput') {
         videoSource = si.label || 'camera 1';
         break;
       }
@@ -102,7 +91,7 @@
   }
     
   function successCallback(stream) {
-    var url = window.webkitURL || window.URL;
+    var url = window.URL;
     cameraStream = stream; 
 
     if (url) {
@@ -133,17 +122,8 @@
         console.log('posted', msg);
       }
     });
-    //Kairos upload
-    /*
-    var base64_data = base64_image.replace(/^data:image\/(png|jpg);base64,/, "");
-    var subject_id  = 'camerauser';
-    var gallery_id  = 'learningames';
-
-    kairos.enroll(base64_data, gallery_id, subject_id, function(response){
-      console.log('response', response);
-    });
-    */
   }
+
   //objectdetect
   function captureFace(){
     var terminated;
@@ -169,28 +149,28 @@
         clip[2] *= aspectX*1.2;
         clip[3] *= aspectY*1.2;
 
-        /*
-        clip[0] -= 10;
-        clip[1] -= 10;
-        clip[2] += 20;
-        clip[3] += 20;
-        */
+        var rectW = Math.max(clip[2],clip[3]);
+        var rectX = Math.min(video.videoWidth, Math.max(0,clip[0]));
+        var rectY = Math.min(video.videoHeight, Math.max(0,clip[1]));
        
         marco.show();
-        marco.offset({left:clip[0]*scaleX + pos.left,top:clip[1]*scaleX + pos.top})
-        marco.width(clip[2]*scaleX);
-        marco.height(clip[3]*scaleX);
+        marco.offset({left:rectX*scaleX + pos.left,top:rectY*scaleX + pos.top})
+        marco.width(rectW*scaleX);
+        marco.height(rectW*scaleX);
         
-        if(detections++ == 13){
+        if(detections++ == mindetections){
           terminated = true;          
 
           canvas.get(0).getContext('2d').clearRect(0,0,canvas.width(),canvas.height())
-          canvas.get(0).width = clip[2];
-          canvas.get(0).height = clip[3];
-          canvas.get(0).getContext('2d').drawImage(video, clip[0],clip[1],clip[2],clip[3], 0, 0, clip[2], clip[3]);
+          canvas.get(0).width = rectW;
+          canvas.get(0).height = rectW;
+          canvas.get(0).getContext('2d').drawImage(video, rectX,rectY,rectW,rectW, 0, 0, rectW, rectW);
           
           sendImageToServer();
         }
+      }
+      else{
+        marco.hide();
       }
     }
     if(!terminated){

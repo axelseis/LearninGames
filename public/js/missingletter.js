@@ -36,40 +36,32 @@
 		},
 
         _onNewWord: function(newWord){
-            //this.sol = newWord[1];
-            
             this.word.html(newWord[0]);
             this.word.fitText(0.5);
-            
-            //this.imageWord.attr('src', '/images/' + newWord[0].replace('_',this.sol) + '.png');
+
             this.playersContainer.children('.player').removeAttr('sol');
             this.letters.empty();
 
-            for (var i = 0; i < newWord[2].length; i++) {
-              var newLetter = $('<div class="letter">' + newWord[2][i] + '</div>');
-
+            for (var i = 0; i < newWord[1].length; i++) {
+              var newLetter = $('<div class="letter">' + newWord[1][i] + '</div>');
+              
               newLetter.click(this._onClickLetter.bind(this));
-
               this.letters.append(newLetter);
             }
         },
 
         _onEnterGame: function(initPlayers){
-          console.log('initPlayers', initPlayers);
           this.players = initPlayers;
-
           this.playersContainer.empty();
-          console.log('enterGame empty: ', this.players);
+          
           for (var i = 0; i < this.players.length; i++) {
             this.playersContainer.append('<div class="player" id="' + this.players[i].id + '"><img src="' + this.players[i].avatar + '" /></div>');
           }
         },
 
         _onNewPlayer: function(player){
-          console.log('newPlayer: ', player);
           this.players.push(player);
           this.playersContainer.append('<div class="player" id="' + player.id + '"><img src="' + player.avatar + '" /></div>');
-          console.log('newPlayer: ', this.players);
         },
 
         _onRemovePlayer: function(playerId){
@@ -77,7 +69,6 @@
             return player.id != playerId;
           });
           $(".player[id='" + playerId + "']").remove();
-          console.log('removePlayer: ', this.players);
         },
 
         _onPlayerWins: function(playerId){
@@ -89,7 +80,6 @@
             if(playerId == this.myPlayer.id){
               this.letters.children('.letter[sol]').attr('sol', 'ok');
             }
-            console.log('playerWins', playerId);
         },
 
         _onPlayerSol: function(playerData){
@@ -99,7 +89,6 @@
             if(playerData[0] == this.myPlayer.id){
               this.letters.children('.letter[sol]').attr('sol', playerData[1]);
             }
-            console.log('playerSol', playerData);
         },
 
         _sendSolution: function(letter){
@@ -110,7 +99,6 @@
         init: function(){
           this.playersContainer = $('.playersContainer');
           this.wordModal = $('.wordModal');
-          //this.imageWord = $('.imageWord');
           this.word = $('.word');
           this.letters = $('footer>div.letters');
           this.time = $('.time');

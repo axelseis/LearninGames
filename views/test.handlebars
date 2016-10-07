@@ -19,22 +19,19 @@ this.words = words;
 
   _getRandomWord = function(){
     var wordN = Math.floor(Math.random()*this.words.length);
-    console.log('this.lastWords', this.lastWords);
-    console.log('wordN', wordN);
-    while(this.lastWords.indexOf('w'+wordN) != -1){
+    while(this.lastWords.indexOf(wordN) != -1){
       wordN = Math.floor(Math.random()*this.words.length);
-      console.log('wordN', wordN);
     }
 
     var letterN = Math.floor(Math.random()*this.words[wordN][1].length);
-    var filled = this.words[wordN][1].slice(0).splice(letterN+1,1).concat(this.words[wordN][2]).sort(function(){return 0.5 - Math.random()}).splice(0,4).concat(this.words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()});
+    var filled = this.words[wordN][2].concat(this.words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()}).splice(0,5);
 
-    this.lastWords.push('w'+wordN);
+    this.lastWords.push(wordN);
     if(this.lastWords.length > this.words.length/2){
       this.lastWords.shift();
     }
 
-    return [this.words[wordN][0],this.words[wordN][1][letterN],filled];
+    return [this.words[wordN][0],filled,this.words[wordN][1][letterN]];
   };
 
   for (var i = 0; i < 100; i++) {

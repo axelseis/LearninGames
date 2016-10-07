@@ -18,6 +18,7 @@ var Game = function(){
   this.words = words;
   this.lastWords = [];
   this.actWord;
+  this.actSol;
 
   this.maxTime = 10;
   this.winTime = 3;
@@ -26,6 +27,7 @@ var Game = function(){
 
   this.solved;
 }
+
 
 Game.prototype = {
   
@@ -36,7 +38,6 @@ Game.prototype = {
   },
 
   _onNewPlayer: function(playerSocket, player){
-      console.log('_onNewPlayer: ', player);
     this.players.push(player);
 
     playerSocket.emit('enterGame', this.players);
@@ -51,7 +52,7 @@ Game.prototype = {
   },
 
   _onPlayerSolution: function(playerId,solution) {
-    if(solution == this.actWord[1]){
+    if(solution == this.actSol){
       if(!this.solved){
         this._playerWins(playerId);
       }
@@ -85,25 +86,28 @@ Game.prototype = {
 
   _getRandomWord: function(){
     var wordN = Math.floor(Math.random()*this.words.length);
-    while(this.lastWords.indexOf('w'+wordN) != -1){
+    while(this.lastWords.indexOf(wordN) != -1){
       wordN = Math.floor(Math.random()*this.words.length);
     }
 
     var letterN = Math.floor(Math.random()*this.words[wordN][1].length);
-    var filled = this.words[wordN][1].slice(0).splice(letterN+1,1).concat(this.words[wordN][2]).sort(function(){return 0.5 - Math.random()}).splice(0,4).concat(this.words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()});
+    var filled = this.words[wordN][2].concat(this.words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()}).splice(0,5);
 
-    this.lastWords.push('w'+wordN);
+    this.lastWords.push(wordN);
     if(this.lastWords.length > this.words.length/2){
       this.lastWords.shift();
     }
 
-    return [this.words[wordN][0],this.words[wordN][1][letterN],filled];
+    return [[this.words[wordN][0],filled],this.words[wordN][1][letterN]];
   },
 
   _newGame: function(){
+    var newWord = this._getRandomWord();
+
     this.solved = false;
     this.playersEnded = 0;
-    this.actWord = this._getRandomWord();
+    this.actWord = newWord[0];
+    this.actSol = newWord[1];
     this.timeLeft = this.maxTime;
 
     this.gameIO.emit('newWord',this.actWord);

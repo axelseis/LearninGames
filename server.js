@@ -68,10 +68,9 @@
 
 
   //===============GAMES===============
-  //MissingLet_er
-  var missingletter = require('./games/missinglet_er.js');
-  //var missingletter = new Ml(io);
   
+  //MissingLet_er
+  var missingletter = require('./games/missingletterServer.js');  
   missingletter.init(io);
 
 

@@ -64,8 +64,8 @@ Game.prototype = {
       this.gameIO.emit('playerSol',[playerId,'ko']);
     }
 
-    if(this.playersEnded++ == this.players.length){
-      this._newGame();
+    if(this.playersEnded++ == this.players.length-1){
+      this.timeLeft = 0;
     }
   },
 

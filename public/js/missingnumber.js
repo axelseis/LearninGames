@@ -1,13 +1,13 @@
 
 
 
-    LGamesClient.Games.MissingLetter = (function(){
-      var MissingLetter = function(userAvatar){
-        LGamesClient.Game.call(this,'missinglet_er',userAvatar);
+    LGamesClient.Games.MissingNumber = (function(){
+      var MissingNumber = function(userAvatar){
+        LGamesClient.Game.call(this,'missingnumb3r',userAvatar);
       }
 
-      MissingLetter.prototype = Object.create(LGamesClient.Game.prototype);
-      MissingLetter.prototype.constructor = MissingLetter;
+      MissingNumber.prototype = Object.create(LGamesClient.Game.prototype);
+      MissingNumber.prototype.constructor = MissingNumber;
 
       var _api = {
 
@@ -15,7 +15,7 @@
           LGamesClient.Game.prototype._initSocketEvents.call(this);
           
           this.socket.on('timeTick', this._onTimeTick.bind(this));
-          this.socket.on('newWord', this._onNewWord.bind(this));
+          this.socket.on('newOperation', this._onNewOperation.bind(this));
           this.socket.on('enterGame', this._onEnterGame.bind(this));
           this.socket.on('newPlayer', this._onNewPlayer.bind(this));
           this.socket.on('removePlayer', this._onRemovePlayer.bind(this));
@@ -28,29 +28,29 @@
           this.time.fitText(0.15);
 
           if(showSol){
-          	this.word.html(this.word.html().replace('_','<span class="sol">' + showSol + '</span>'));
+          	this.operation.html(this.operation.html().replace('_','<span class="sol">' + showSol + '</span>'));
           }
         },
 
-        _onClickLetter: function(event) {
-    			var letter = $(event.currentTarget);
+        _onClickNumber: function(event) {
+			var number = $(event.currentTarget);
 
-    			letter.attr('sol', 'true');
-    			this._sendSolution(letter.html());
-    		},
+			number.attr('sol', 'true');
+			this._sendSolution(number.html());
+		},
 
-        _onNewWord: function(newWord){
-            this.word.html(newWord[0]);
-            this.word.fitText(0.5);
+        _onNewOperation: function(newOperation){
+            this.operation.html(newOperation[0]);
+            this.operation.fitText(0.5);
 
             this.playersContainer.children('.player').removeAttr('sol');
-            this.letters.empty();
+            this.numbers.empty();
 
-            for (var i = 0; i < newWord[1].length; i++) {
-              var newLetter = $('<div class="letter">' + newWord[1][i] + '</div>');
+            for (var i = 0; i < newOperation[1].length; i++) {
+              var newNumber = $('<div class="number">' + newOperation[1][i] + '</div>');
               
-              newLetter.click(this._onClickLetter.bind(this));
-              this.letters.append(newLetter);
+              newNumber.click(this._onClickNumber.bind(this));
+              this.numbers.append(newNumber);
             }
         },
 
@@ -82,7 +82,7 @@
             this.playersContainer.prepend(playerWin);
             
             if(playerId == this.myPlayer.id){
-              this.letters.children('.letter[sol]').attr('sol', 'ok');
+              this.numbers.children('.number[sol]').attr('sol', 'ok');
             }
         },
 
@@ -91,26 +91,26 @@
             player.attr('sol', playerData[1]);
 
             if(playerData[0] == this.myPlayer.id){
-              this.letters.children('.letter[sol]').attr('sol', playerData[1]);
+              this.numbers.children('.number[sol]').attr('sol', playerData[1]);
             }
         },
 
-        _sendSolution: function(letter){
-          $('.letter').off('click');
-          this.socket.emit('playerSol', letter);      
+        _sendSolution: function(number){
+          $('.number').off('click');
+          this.socket.emit('playerSol', number);      
         },
 
         init: function(){
           this.playersContainer = $('.playersContainer');
-          this.wordModal = $('.wordModal');
-          this.word = $('.word');
-          this.letters = $('footer>div.letters');
+          this.operationModal = $('.operationModal');
+          this.operation = $('.operation');
+          this.numbers = $('footer>div.numbers');
           this.time = $('.time');
           this.avatar = $('footer>img')
         }
       }
 
-      $.extend(MissingLetter.prototype, _api);
-      return MissingLetter;
+      $.extend(MissingNumber.prototype, _api);
+      return MissingNumber;
 
     }());

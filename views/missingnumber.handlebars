@@ -1,0 +1,22 @@
+
+
+
+  <!-- views/missingnumber.handlebars -->
+  <div class="gameContainer">
+    <div class="playersContainer"></div>
+    <div class="operationModal">
+      <div class="operation noselect"></div>
+      <div class="time noselect"></div>
+    </div>
+  </div>
+  <footer class="footer">
+    <img src="{{user.avatar}}"/>
+    <div class="numbers noselect"></div>      
+  </footer>
+
+  <script>
+
+    var game = new LGamesClient.Games.MissingNumber('{{user.avatar}}');
+    game.init();
+
+  </script>

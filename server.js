@@ -73,5 +73,9 @@
   var missingletter = require('./games/missingletterServer.js');  
   missingletter.init(io);
 
+  //MissingNumb3r
+  var missingnumber = require('./games/missingnumberServer.js');  
+  missingnumber.init(io);
+
 
 

@@ -102,68 +102,9 @@ canvas.gamecanvas {
     background-color: red;
 }
 
-
-
-.wordModal {
-    width: 80%;
-    height: 40%;
-    min-height: 200px;
-    background-color: rgba(245, 245, 220, 0.69);
-    position: absolute;
-    left: 10%;
-    bottom: 25%;
-    /* margin-top: -30%; */
-    border-radius: 10px;
-}
-
-.wordModal>.word {
-    position: absolute;
-    bottom: 10px;
-    text-align: center;
-    width: 100%;
-    font-size: 80px;
-    height: 50%;
-}
-
-.wordModal>.word>.sol{
-  color: green;
-}
-
-.letters {
-    position: absolute;
-    left: 80px;
-    right: 0;
-    height: 100%;
-    /* background-color: black; */
-}
-
 footer>img {
     float: left;
 }
-
-.letters>.letter {
-    width: 20%;
-    height: 100%;
-    float: left;
-    text-align: center;
-    font-size: 45px;
-    padding-top: 10px;
-    cursor: pointer;
-}
-
-img.imageWord {
-    max-height: 50%;
-}
-
-/*
-.letters>.letter[sol="ok"] {
-    background-color: greenyellow;
-}
-
-.letters>.letter[sol="ko"] {
-    background-color: red;
-}
-*/
 
 .time {
     position: absolute;
@@ -231,3 +172,86 @@ div#overlay {
     background-repeat: no-repeat;
     background-position-x: center;
 }
+
+.wordModal {
+    width: 80%;
+    height: 40%;
+    min-height: 200px;
+    background-color: rgba(245, 245, 220, 0.69);
+    position: absolute;
+    left: 10%;
+    bottom: 25%;
+    border-radius: 10px;
+}
+
+.wordModal>.word {
+    position: absolute;
+    bottom: 10px;
+    text-align: center;
+    width: 100%;
+    font-size: 80px;
+    height: 50%;
+}
+
+.wordModal>.word>.sol{
+  color: green;
+}
+
+.letters {
+    position: absolute;
+    left: 80px;
+    right: 0;
+    height: 100%;
+}
+
+.letters>.letter {
+    width: 20%;
+    height: 100%;
+    float: left;
+    text-align: center;
+    font-size: 45px;
+    padding-top: 10px;
+    cursor: pointer;
+}
+
+.operationModal {
+    width: 80%;
+    height: 40%;
+    min-height: 200px;
+    background-color: rgba(245, 245, 220, 0.69);
+    position: absolute;
+    left: 10%;
+    bottom: 25%;
+    border-radius: 10px;
+}
+
+.operationModal>.operation {
+    position: absolute;
+    bottom: 10px;
+    text-align: center;
+    width: 100%;
+    font-size: 80px;
+    height: 50%;
+}
+
+.operationModal>.operation>.sol{
+  color: green;
+}
+
+.numbers {
+    position: absolute;
+    left: 80px;
+    right: 0;
+    height: 100%;
+}
+
+.numbers>.number {
+    width: 20%;
+    height: 100%;
+    float: left;
+    text-align: center;
+    font-size: 45px;
+    padding-top: 10px;
+    cursor: pointer;
+}
+

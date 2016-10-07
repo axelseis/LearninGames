@@ -116,9 +116,15 @@ module.exports = function(app, passport){
 	});
 
 	//missing letter
-	app.get('/games/missinglet_er', isLoggedIn, function(req, res){
+	app.get('/games/missingletter', isLoggedIn, function(req, res){
 	  res.locals.ingame = 'MissingLet_er';
-	  res.render('missinglet_er', {user: req.user});
+	  res.render('missingletter', {user: req.user});
+	});
+
+	//missing letter
+	app.get('/games/missingnumber', isLoggedIn, function(req, res){
+	  res.locals.ingame = 'MissingNumb3r';
+	  res.render('missingnumber', {user: req.user});
 	});
 
 

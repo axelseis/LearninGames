@@ -1,51 +1,19 @@
 
 
 
-    var LGClient = {};
-    LGClient.Games = {};
-
-    LGClient.Game = (function(){
-      var Game = function(name,userAvatar){
-        this.name = name;
-        this.socket = io('/' + this.name);
-        this.myPlayer = {
-          id: '',
-          avatar: userAvatar
-        };
-
-        this._initSocketEvents();
-      }
-
-      var _api = {
-        _onConnect: function(){
-          this.myPlayer.id = this.socket.id;
-          this.socket.emit('newPlayer', this.myPlayer);
-        },
-
-        _initSocketEvents: function(){
-          this.socket.on('connect', this._onConnect.bind(this));
-        }
-      }
-
-      Game.prototype = _api;
-      Game.prototype.constructor = Game;
-
-      return Game;
-    }());
-
-    LGClient.Games.MissingLetter = (function(){
+    LGamesClient.Games.MissingLetter = (function(){
       var MissingLetter = function(userAvatar){
-        LGClient.Game.call(this,'missinglet_er',userAvatar);
+        LGamesClient.Game.call(this,'missinglet_er',userAvatar);
       }
 
-      MissingLetter.prototype = Object.create(LGClient.Game.prototype);
+      MissingLetter.prototype = Object.create(LGamesClient.Game.prototype);
       MissingLetter.prototype.constructor = MissingLetter;
 
       var _api = {
 
         _initSocketEvents: function(){
-          console.log('LGClient.Game._initSocketEvents', LGClient.Game);
-          LGClient.Game.prototype._initSocketEvents.call(this);
+          console.log('LGamesClient.Game._initSocketEvents', LGamesClient.Game);
+          LGamesClient.Game.prototype._initSocketEvents.call(this);
           
           this.socket.on('timeTick', this._onTimeTick.bind(this));
           this.socket.on('newWord', this._onNewWord.bind(this));
@@ -68,12 +36,12 @@
 		},
 
         _onNewWord: function(newWord){
-            this.sol = newWord[1];
+            //this.sol = newWord[1];
             
             this.word.html(newWord[0]);
             this.word.fitText(0.5);
             
-            this.imageWord.attr('src', '/images/' + newWord[0].replace('_',this.sol) + '.png');
+            //this.imageWord.attr('src', '/images/' + newWord[0].replace('_',this.sol) + '.png');
             this.playersContainer.children('.player').removeAttr('sol');
             this.letters.empty();
 
@@ -142,7 +110,7 @@
         init: function(){
           this.playersContainer = $('.playersContainer');
           this.wordModal = $('.wordModal');
-          this.imageWord = $('.imageWord');
+          //this.imageWord = $('.imageWord');
           this.word = $('.word');
           this.letters = $('footer>div.letters');
           this.time = $('.time');

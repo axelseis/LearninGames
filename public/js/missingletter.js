@@ -90,7 +90,8 @@
           console.log('initPlayers', initPlayers);
           this.players = initPlayers;
 
-          console.log('enterGame: ', this.players);
+          this.playersContainer.empty();
+          console.log('enterGame empty: ', this.players);
           for (var i = 0; i < this.players.length; i++) {
             this.playersContainer.append('<div class="player" id="' + this.players[i].id + '"><img src="' + this.players[i].avatar + '" /></div>');
           }

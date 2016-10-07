@@ -255,8 +255,6 @@ div#overlay {
     cursor: pointer;
 }
 
-
-
-.letters>.letter:nth-child(2n) {
+.letters>.letter:nth-child(2n):not([sol]) {
   background-color: #d0d0d0;
 }

@@ -29,6 +29,7 @@
 
           if(showSol){
           	this.word.html(this.word.html().replace('_','<span class="sol">' + showSol + '</span>'));
+            this.word.fitText(0.8);
           }
         },
 
@@ -41,7 +42,7 @@
 
         _onNewWord: function(newWord){
             this.word.html(newWord[0]);
-            this.word.fitText(0.5);
+            this.word.fitText(0.8);
 
             this.playersContainer.children('.player').removeAttr('sol');
             this.letters.empty();

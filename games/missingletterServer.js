@@ -1,14 +1,20 @@
 
 
 
-var words = [
-  ['bo_t',['a','l','i','u'],['f','b','n','s','e']],
-  ['station_ry',['a','e'],['d','i','y','o']],
-  ['co_rse',['a','u'],['r','i','p','o']],
-  ['con_ensus',['s'],['c','t','p','o']],
-  ['definit_ly',['e'],['y','h','a','r']],
-  ['separ_te',['a'],['y','r','e','i']]
-];
+var words = require("an-array-of-english-words");
+var letters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','t','u','v','w','x','y','z'];
+
+get4RandomLetters = function(excludeletter,templateWord){
+  var rand = [];
+  var tempLetter = letters[Math.floor(Math.random()*100)];
+  while(rand.length < 5){
+    while(words.indexOf(templateWord.replace('_',tempLetter)) != -1 || rand.indexOf(tempLetter) != -1){
+      tempLetter = letters[Math.floor(Math.random()*100)];
+    }
+    rand.push(tempLetter);
+  }
+  return rand;
+}
 
 var Game = function(){
   this.gameIO;
@@ -83,7 +89,7 @@ Game.prototype = {
       this.timeTick = null;
     }
   },
-
+  /*
   _getRandomWord: function(){
     var wordN = Math.floor(Math.random()*this.words.length);
     while(this.lastWords.indexOf(wordN) != -1){
@@ -99,6 +105,26 @@ Game.prototype = {
     }
 
     return [[this.words[wordN][0],filled],this.words[wordN][1][letterN]];
+  },
+  */
+ 
+  _getRandomWord: function(){
+    var wordN = Math.floor(Math.random()*this.words.length);
+    while(this.lastWords.indexOf(wordN) != -1){
+      wordN = Math.floor(Math.random()*this.words.length);
+    }
+
+    var word = this.words[wordN];
+    var letterN = Math.floor(Math.random()*this.words[wordN].length);
+    var letter = word.charAt(letterN);
+    var templateWord = word.substr(0, letterN) + '_' + word.substr(letterN+1);
+    var filled = get4RandomLetters(letter,templateWord).concat(letter).sort(function(){return 0.5 - Math.random()});
+
+    this.lastWords.push(wordN);
+    if(this.lastWords.length > 200){
+      this.lastWords.shift();
+    }
+    return [[templateWord, filled],letter];
   },
 
   _newGame: function(){

@@ -39,19 +39,14 @@
 
   app.enable('trust proxy');
 
-  // Add a handler to inspect the req.secure flag (see 
-  // http://expressjs.com/api#req.secure). This allows us 
-  // to know whether the request was via http or https.
   app.use (function (req, res, next) {
-          if (req.secure) {
-                  // request was via https, so do no special handling
-                  next();
-          } else {
-                  // request was via http, so redirect to https
-                  res.redirect('https://' + req.headers.host + req.url);
-          }
+    if (req.secure || req.headers.host.indexOf('localhost') == 0) {
+      next();
+    } else {
+      res.redirect('https://' + req.headers.host + req.url);
+    }
   });
-  
+
   // Session-persisted message middleware
   app.use(function(req, res, next){
     var err = req.session.error,
@@ -81,6 +76,11 @@
 
   require('./config/routes.js')(app, passport);
 
+
+  //===============TEST===============
+  
+  //var test = require('./testServer.js');  
+  //test.init();
 
   //===============GAMES===============
   

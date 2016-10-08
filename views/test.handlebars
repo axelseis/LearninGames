@@ -4,82 +4,59 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script>
 	
-var templates = ['_o_','(_o_)o_','_o(_o_)'];
-var numsw = [1,2,3,4,5,6,7,8,9];
-var opsw = ['*','+','-'];
+var words = [
+  ['bo_t',['a','l','i','u']],
+  ['station_ry',['a','e']],
+  ['co_rse',['a','u']],
+  ['con_ensus',['s']],
+  ['definit_ly',['e']],
+  ['separ_te',['a']],
+  ['bure_ucracy',['a']],
+  ['mano_uvre',['e']],
+  ['entreprene_r',['u']],
+  ['unne_essary',['c']],
+  ['Liqu_fy',['e','i']],
+];
 
+var words2 = [
+  'boat','bolt','boit','bout','stationary','stationery'
+]
+var letters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','t','u','v','w','x','y','z'];
+var lastWords = [];
 
+var funWords = words.filter(function(w) { return !!w.match(/^fun/i) })
+console.log(funWords)
 
-  function evalExpr(express){
-    return(Math.round(eval(express)*10)/10);
+function get4RandomLetters(exclude){
+  var rand = [];
+  var tempLet = letters[Math.floor(Math.random()*100)];
+  while(rand.length < 5){
+    while(rand.indexOf(tempLet) != -1 || exclude.indexOf(tempLet) != -1){
+      tempLet = letters[Math.floor(Math.random()*100)];
+    }
+    rand.push(tempLet);
+  }
+  return rand;
+}
+function _getRandomWord(){
+  var wordN = Math.floor(Math.random()*words.length);
+  while(lastWords.indexOf(wordN) != -1){
+    wordN = Math.floor(Math.random()*words.length);
   }
 
-  function getAllIndexes(str, val) {
-    var indexes = [], i;
-    for(i = 0; i < str.length; i++)
-        if (str[i] === val)
-            indexes.push(i);
-    return indexes;
+  var letterN = Math.floor(Math.random()*words[wordN][1].length);
+  var filled = get4RandomLetters(words[wordN][1]).concat(words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()}).splice(0,5);
+
+  lastWords.push(wordN);
+  if(lastWords.length > words.length/2){
+    lastWords.shift();
   }
 
-  function get4RandomNumbers(val){
-    var rand = [];
-    var tempNum = Math.floor(Math.random()*100);
-    while(rand.length < 4){
-      while(Math.abs(val-tempNum) > 10 || rand.indexOf(tempNum) != -1 || tempNum == val || tempNum == 0){
-        tempNum = Math.floor(Math.random()*100);
-      }
-      rand.push(tempNum);
-    }
-    return rand;
-  }
+  return [[words[wordN][0],filled.toString()].toString(),words[wordN][1][letterN]];
+};
 
-  function _getRandomOperation(pos){
-    var pos = pos || 0;
-    var tempExp = '';
-    var nums = numsw.slice();
-    var ops = opsw.slice();
-    var min = 0;
-    var max = 100;
-    var value = 0;
-    var solPos,
-        solValue,
-        filled;
-    
-    var actTemplate = templates[Math.floor(Math.random()*templates.length)]
-
-    for (var i = 0; i < actTemplate.length; i++) {
-      var tempChar = actTemplate.charAt(i);
-      if(tempChar == '_'){
-        var tempN = nums.splice(Math.floor(Math.random()*nums.length),1)[0];
-        tempExp += tempN;
-      }
-      else if(tempChar == 'o'){
-        var tempN = ops.splice(Math.floor(Math.random()*ops.length),1)[0];
-        tempExp += tempN;
-      }
-      else{
-        tempExp += tempChar;
-      }
-    }
-
-    value = value || evalExpr(tempExp)
-
-    if((value < min || value > max) && pos < 1000){
-      return _getRandomOperation(pos+1);
-    }
-    else{     
-      solPos = getAllIndexes(actTemplate,'_').concat(['end']).sort(function(){return 0.5 - Math.random()})[0];
-      solValue = solPos == 'end' ? value : tempExp.charAt(solPos);
-      tempExp = solPos == 'end' ? tempExp : tempExp.substr(0, solPos) + '_' + tempExp.substr(solPos+1,tempExp.length);
-      filled = get4RandomNumbers(solValue).concat(solValue).sort(function(){return 0.5 - Math.random()});
-
-      return [[solPos == 'end' ? tempExp + '=_' : tempExp + '=' + value, filled.toString()].toString(), solValue];
-    }
-  };
-
-  for (var i = 0; i < 100; i++) {
-  	console.log('_getRandomOperation:', _getRandomOperation());
-  }
+for (var i = 0; i < 100; i++) {
+	console.log('_getRandomWord:', _getRandomWord());
+}
 </script>
 

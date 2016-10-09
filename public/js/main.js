@@ -8,15 +8,13 @@ LGamesClient.Main = (function(){
 
   onResize = function(ev){
     var screenOrientation = ($(window).width() > $(window).height())? 90 : 0;
+    var keyboard_shown = $(window).scrollTop() > 0;
 
-    switch(screenOrientation) {  
-      case 90:
-        overlay.show();
-        console.log('overlay', overlay);
-        break; 
-      case 0:
-        overlay.hide();
-        break; 
+    if(screenOrientation == 90 && !keyboard_shown){
+        overlay.show();      
+    }
+    else{
+      overlay.hide();      
     }
   };
 

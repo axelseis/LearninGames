@@ -166,7 +166,8 @@ div#overlay {
     width: 100%;
     height: 100%;
     background-color: #bdbdbd;
-    position: fixed;
+    position: absolute;
+    z-index: 10000000;
     top: 0;
     left: 0;
     background-image: url('portrait-orientation.png');

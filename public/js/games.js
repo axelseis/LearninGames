@@ -1,7 +1,6 @@
 
 
 
-var LGamesClient = {};
 LGamesClient.Games = {};
 
 LGamesClient.Game = (function(){

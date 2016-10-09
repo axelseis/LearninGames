@@ -1,6 +1,7 @@
 
 
 
+/*
 @media (orientation: portrait) {
   #all { display: block; }
   #overlay { display: none; }
@@ -9,6 +10,7 @@
   #all { display: none; }
   #overlay { display: block; }
 }
+*/
 
 html, body {
 	height: 100%;
@@ -171,6 +173,7 @@ div#overlay {
     background-size: contain;
     background-repeat: no-repeat;
     background-position-x: center;
+    /* display: none; */
 }
 
 .wordModal {

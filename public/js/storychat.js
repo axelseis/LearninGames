@@ -54,8 +54,9 @@
           }
         },
 
-        _onEnterGame: function(initPlayers){
+        _onEnterGame: function(initPlayers, story){
           this.players = initPlayers;
+          this._onNewStory(story);
         },
 
         _onNewPlayer: function(player){
@@ -83,7 +84,7 @@
 
           this.myturnModal.hide();
           this.footer.hide();
-          
+
           this.usersPars.append(this.actPlayerPar);
           this.actPlayerPar.children('.par').focus();
 

@@ -121,10 +121,16 @@ module.exports = function(app, passport){
 	  res.render('missingletter', {user: req.user});
 	});
 
-	//missing letter
+	//missing number
 	app.get('/games/missingnumber', isLoggedIn, function(req, res){
 	  res.locals.ingame = 'MissingNumb3r';
 	  res.render('missingnumber', {user: req.user});
+	});
+
+	//story chat
+	app.get('/games/storychat', isLoggedIn, function(req, res){
+	  res.locals.ingame = 'StoryChat';
+	  res.render('storychat', {user: req.user});
 	});
 
 

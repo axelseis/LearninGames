@@ -16,7 +16,7 @@ get4RandomLetters = function(excludeletter,templateWord){
   return rand;
 }
 
-var Game = function(){
+var MissingLetter = function(){
   this.gameIO;
   this.players = [];
   this.playersEnded = 0;
@@ -35,7 +35,7 @@ var Game = function(){
 }
 
 
-Game.prototype = {
+MissingLetter.prototype = {
   
   _onClientConnected: function(client){
     client.on("newPlayer", this._onNewPlayer.bind(this,client));
@@ -89,30 +89,13 @@ Game.prototype = {
       this.timeTick = null;
     }
   },
-  /*
-  _getRandomWord: function(){
-    var wordN = Math.floor(Math.random()*this.words.length);
-    while(this.lastWords.indexOf(wordN) != -1){
-      wordN = Math.floor(Math.random()*this.words.length);
-    }
-
-    var letterN = Math.floor(Math.random()*this.words[wordN][1].length);
-    var filled = this.words[wordN][2].concat(this.words[wordN][1][letterN]).sort(function(){return 0.5 - Math.random()}).splice(0,5);
-
-    this.lastWords.push(wordN);
-    if(this.lastWords.length > this.words.length/2){
-      this.lastWords.shift();
-    }
-
-    return [[this.words[wordN][0],filled],this.words[wordN][1][letterN]];
-  },
-  */
  
   _getRandomWord: function(){
-    var wordN = Math.floor(Math.random()*this.words.length);
-    while(this.lastWords.indexOf(wordN) != -1){
-      wordN = Math.floor(Math.random()*this.words.length);
+    var wordN;
+    do{
+      wordN = Math.floor(Math.random()*this.words.length);      
     }
+    while(this.lastWords.indexOf(wordN) != -1);
 
     var word = this.words[wordN];
     var letterN = Math.floor(Math.random()*this.words[wordN].length);
@@ -170,5 +153,5 @@ Game.prototype = {
   }
 }
 
-module.exports = new Game();
+module.exports = new MissingLetter();
 

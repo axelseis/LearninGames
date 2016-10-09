@@ -92,5 +92,9 @@
   var missingnumber = require('./games/missingnumberServer.js');  
   missingnumber.init(io);
 
+  //StoryChat
+  var storychat = require('./games/storychatServer.js');  
+  storychat.init(io);
+
 
 

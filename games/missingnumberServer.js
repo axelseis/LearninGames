@@ -2,7 +2,19 @@
 
 
 
-var Game = function(){
+function evalExpr(express){
+  return(Math.round(eval(express)*10)/10);
+}
+
+function getAllIndexes(str, val) {
+  var indexes = [], i;
+  for(i = 0; i < str.length; i++)
+      if (str[i] === val)
+          indexes.push(i);
+  return indexes;
+}
+
+var MissingNumber = function(){
   this.gameIO;
   this.players = [];
   this.playersEnded = 0;
@@ -22,21 +34,10 @@ var Game = function(){
   this.solved;
 }
 
-function evalExpr(express){
-  return(Math.round(eval(express)*10)/10);
-}
-
-function getAllIndexes(str, val) {
-  var indexes = [], i;
-  for(i = 0; i < str.length; i++)
-      if (str[i] === val)
-          indexes.push(i);
-  return indexes;
-}
-
 function get4RandomNumbers(val){
   var rand = [];
   var tempNum = Math.floor(Math.random()*100);
+  
   while(rand.length < 4){
     while(Math.abs(val-tempNum) > 10 || rand.indexOf(tempNum) != -1 || tempNum == val || tempNum == 0){
       tempNum = Math.floor(Math.random()*100);
@@ -46,7 +47,7 @@ function get4RandomNumbers(val){
   return rand;
 }
 
-Game.prototype = {
+MissingNumber.prototype = {
   
   _onClientConnected: function(client){
     client.on("newPlayer", this._onNewPlayer.bind(this,client));
@@ -188,5 +189,5 @@ Game.prototype = {
   }
 }
 
-module.exports = new Game();
+module.exports = new MissingNumber();
 

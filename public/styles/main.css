@@ -174,7 +174,7 @@ div#overlay {
     background-size: contain;
     background-repeat: no-repeat;
     background-position-x: center;
-    /* display: none; */
+    display: none;
 }
 
 .wordModal {

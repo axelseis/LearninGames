@@ -21,9 +21,9 @@ LGamesClient.Main = (function(){
   return{
       init: function(){
         overlay = $('#overlay');
-        window.addEventListener('resize', onResize);
+        //window.addEventListener('resize', onResize);
 
-        onResize();
+        //onResize();
       }
   };
 })();

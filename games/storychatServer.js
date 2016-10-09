@@ -16,7 +16,7 @@ var StoryChat = function(){
   this.gameIO;
   this.players = [];
   this.actPlayer;
-
+ 
   this.begins = begins;
   this.lastBegins = [];
   this.story = [];

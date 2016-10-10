@@ -9,6 +9,10 @@
     </div>
     <div id="myturnModal">
       <h1>It's your turn</h1>
+      <div id="myturnCountdown"></div>
+      <a id="endBut" href="#" class="btn btn-warning btn-block" role="button">
+        <span class="glyphicon glyphicon-heart-empty"></span> THE END
+      </a>
       <a id="dismissBut" href="#" class="btn btn-danger btn-block" role="button">
         <span class="glyphicon glyphicon-remove-sign"></span> Dismiss
       </a>
@@ -19,6 +23,15 @@
   </div>
   <footer class="footer">
     <img src="{{user.avatar}}"/>
+    <div class="footerText"></div>
+    <div class="buts">
+      <a id="newStoryBut" href="#" class="btn btn-success btn-block" role="button">
+        <span class="glyphicon glyphicon-play-circle"></span> New Story
+      </a>
+      <a id="downloadBut" href="#" class="btn btn-warning btn-block" role="button">
+        <span class="glyphicon glyphicon-circle-arrw-down"></span> Download
+      </a>      
+    </div>
   </footer>
 
   <script>

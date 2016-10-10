@@ -20,7 +20,6 @@ function StrategyCamera(options, verify) {
 util.inherits(StrategyCamera, passport.Strategy);
 
 StrategyCamera.prototype.authenticate = function authenticate(req) {
-    //console.log('req', req);
 	if (this.passAuthentication) {
 		var username = 'camerauser_' + usersNum++;
 		var filename = '/users/' + username + '.png';

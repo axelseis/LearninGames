@@ -11,47 +11,17 @@
 
       var _api = {
 
-        _initSocketEvents: function(){
-          LGamesClient.Game.prototype._initSocketEvents.call(this);
+        _initSocket: function(){
+          LGamesClient.Game.prototype._initSocket.call(this);
           
-          this.socket.on('timeTick', this._onTimeTick.bind(this));
-          this.socket.on('newStory', this._onNewStory.bind(this));
           this.socket.on('enterGame', this._onEnterGame.bind(this));
           this.socket.on('newPlayer', this._onNewPlayer.bind(this));
-          this.socket.on('playerStartWrite', this._onPlayerStartWrite.bind(this));
           this.socket.on('removePlayer', this._onRemovePlayer.bind(this));
-          this.socket.on('playerPar', this._onPlayerPar.bind(this));
-          this.socket.on('timeTick', this._onTimeTick.bind(this));
-        },
-
-        _onTimeTick: function(newTime,showSol){
-          this.time.html(newTime);
-          this.time.fitText(0.15);
-
-          if(showSol){
-          	this.word.html(this.word.html().replace('_','<span class="sol">' + showSol + '</span>'));
-            this.word.fitText(0.8);
-          }
-        },
-
-        _onNewStory: function(newStory){
-            console.log('newStory', newStory);
-            this.begin.html(newStory[0][0] + '<br/><i>' + newStory[0][1] + ' (' + newStory[0][2] + ')' + '</i>');
-        },
-
-        _onPlayerStartWrite: function(newPlayerId){
-          if(newPlayerId == this.myPlayer.id){
-            this.myturnModal.show();
-          }
-          else{
-            var newPlayer = this.getPlayerById(newPlayerId);
-
-            this.actPlayerPar = this.actPlayerParTemplate.clone();
-            this.actPlayerPar.children('.playerAvatar').src = newPlayer.avatar;
-            this.actPlayerPar.children('.par').html('waiting ...');
-
-            this.usersPars.append(this.actPlayerPar);
-          }
+          this.socket.on('newStory', this._onNewStory.bind(this));
+          this.socket.on('TheEnd', this._onTheEnd.bind(this));
+          this.socket.on('nextPlayer2Write', this._onNextPlayer2Write.bind(this));
+          this.socket.on('playerDismiss', this._onPlayerDismiss.bind(this));
+          this.socket.on('playerWrite', this._onPlayerWrite.bind(this));
         },
 
         _onEnterGame: function(initPlayers, story){
@@ -64,45 +34,168 @@
         },
 
         _onRemovePlayer: function(playerId){
+          if(this.actPlayerId == playerId){
+            this.actPlayerPar.remove();
+          }
+
           this.players = this.players.filter(function(player) {
             return player.id != playerId;
           });
         },
 
-        _onPlayerPar: function(playerData){
-            console.log('playerData', playerData);
+        _onNewStory: function(newStory){
+          this.usersPars.empty();
+          for (var i = 0; i < newStory.length; i++) {
+            if(i==0) {
+              this.begin.html(newStory[0][0] + '<br/><i>' + newStory[0][1] + ' (' + newStory[0][2] + ')' + '</i>');
+            }
+            else{
+              var newPar = this.actPlayerParTemplate.clone();
+              newPar.html(newStory[i]);
+
+              this.usersPars.append(newPar);
+              //this._onPlayerPar(newStory[i]);
+            }
+          }
         },
 
-        _sendPar: function(paragraph){
-          this.socket.emit('playerPar', paragraph);      
+        _onNextPlayer2Write: function(newPlayerId){
+          var newPlayer = this.getPlayerById(newPlayerId);
+
+          this.actPlayerId = newPlayerId;
+          this.actPlayerPar = this.actPlayerParTemplate.clone();
+          this.actPlayerPar.children('.playerAvatar').attr('src', newPlayer.avatar);
+          this.actPlayerPar.children('.par').html('waiting ...');
+
+          this.usersPars.append(this.actPlayerPar);
+
+          window.clearInterval(this.countdownTO);
+
+          if(newPlayerId == this.myPlayer.id){
+            this.myturnModal.show();
+            this._setCountdown(this.countdownTime);
+            this.footer.hide();
+          }
+          else{
+            var actplayerIndex = this.getPlayerIndexById(newPlayerId);
+            var myindex = this.getPlayerIndexById(this.myPlayer.id)
+            var turns2me =  myindex > actplayerIndex ? myindex - actplayerIndex : this.players.length - actplayerIndex +myindex;
+
+            this.footerText.html(turns2me == 1 ? 'You are the next' : turns2me + ' turns to you');
+          }
+        },
+
+        _setCountdown: function(time){
+          this.myturnCountdown.html(time);
+          if(time-- == 0){
+            this._onClickDismissBut();
+          }
+          else{
+            this.countdownTO = window.setTimeout(this._setCountdown.bind(this, time--),1000);            
+          }
         },
 
         _onClickWriteBut: function(event){
-          this.actPlayerPar = this.actPlayerParTemplate.clone();
-          this.actPlayerPar.children('.playerAvatar').attr('src', this.myPlayer.avatar);
           this.actPlayerPar.children('.par').attr('contenteditable','true');
 
           this.myturnModal.hide();
-          this.footer.hide();
+          window.clearInterval(this.countdownTO);
 
-          this.usersPars.append(this.actPlayerPar);
+          this.actPlayerPar.keyup(this._onKeyPress.bind(this));
+          this.actPlayerPar.children('.par').html('');
           this.actPlayerPar.children('.par').focus();
-
-          this.socket.emit('playerStartWrite', this.myPlayer.id);      
         },
 
         _onClickDismissBut: function(event){
-          this.socket.emit('playerDismissWrite', this.myPlayer.id);      
+          this.actPlayerPar.remove();
+
+          this.footer.show();
+          this.myturnModal.hide();    
+          window.clearInterval(this.countdownTO);
+
+          this.socket.emit('playerDismiss', this.myPlayer.id);
+        },
+
+        _onClickEndBut: function(event){
+          this.actPlayerPar.children('.par').html('THE END');
+
+          this.footer.show();
+          this.myturnModal.hide();    
+          window.clearInterval(this.countdownTO);
+
+          this.socket.emit('TheEnd', this.myPlayer.id, this.actPlayerPar.html());
+        },
+
+        _onClickNewStoryBut: function(event){
+          this.footerButs.hide();
+          this._initSocket();
+        },
+
+        _onClickDownloadBut: function(event){
+          var storyText = this.begin.html();
+          this.usersPars.find('.par').each(function(index, el) {
+            storyText += '</br>' + $(this).html();
+          });
+          $('<a/>').attr({
+              download: 'export.html', 
+              href: "data:text/html," + storyText 
+          })[0].click();
+        },
+
+        _onPlayerDismiss: function(playerId){
+          this.actPlayerPar.remove();
+        },
+
+        _onTheEnd: function(playerPar){
+          var newPar = this.actPlayerParTemplate.clone();
+          newPar.html(playerPar);
+          
+          this.actPlayerPar.remove();
+          this.usersPars.append(newPar);
+
+          this.footerText.html('');
+          this.footerButs.show();
+        },
+
+        _onPlayerWrite: function(playerData){
+          if(playerData[0] != this.myPlayer.id){
+            if(!this.actPlayerPar){
+              this._onNextPlayer2Write(playerData[0]);
+            }
+            this.actPlayerPar.children('.par').html(playerData[1]);            
+          }
+        },
+
+        _onKeyPress: function(event){
+          this.socket.emit('playerWrite', this.myPlayer.id, this.actPlayerPar.children('.par').html());
+
+          if (event.keyCode === 13) { //ENTER
+            this.actPlayerPar.children('.par').removeAttr('contenteditable');
+            this.socket.emit('playerEndsWrite', this.myPlayer.id, this.actPlayerPar.html());
+
+            this.footer.show();
+          }          
         },
 
         init: function(){
+          this.countdownTime = 20;
+          this.countdownTO;
+
           this.storyContainer = $('.storyContainer');
           this.begin = $('#begin');
           this.usersPars = $('#usersPars');
           this.myturnModal = $('#myturnModal');
+          this.myturnCountdown = $('#myturnCountdown');
           this.actPlayerPar;
           this.actPlayerParTemplate = $('<div class="playerPar"><img class="playerAvatar" src=""/><div class="par"></div>');
 
+          this.footerText = $('footer.footer>.footerText');
+          this.footerButs = $('footer.footer>div.buts');
+
+          this.footerButs.children('a#newStoryBut').click(this._onClickNewStoryBut.bind(this));
+          this.footerButs.children('a#downloadBut').click(this._onClickDownloadBut.bind(this));
+
+          this.myturnModal.children('#endBut').on('click', this._onClickEndBut.bind(this));
           this.myturnModal.children('#writeBut').on('click', this._onClickWriteBut.bind(this));
           this.myturnModal.children('#dismissBut').on('click', this._onClickDismissBut.bind(this));
         }

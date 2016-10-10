@@ -294,6 +294,7 @@ div#myturnModal {
     border-radius: 10px;
     padding: 5%;
     text-align: center;
+    display: none;
 }
 
 div#myturnModal>a {
@@ -318,15 +319,56 @@ div#myturnModal>a#writeBut {
 
 
 img.playerAvatar {
-    max-height: 80px;
+    max-height: 60px;
     float: left;
 }
 
 div.playerPar>.par {
-    margin: 5px 5px 5px 85px;
+    margin: 5px 5px 5px 70px;
     /* position: absolute; */
     /* float: right; */
     /* width: 100%; */
     box-sizing: border-box;
     top: 0;
+}
+
+div#usersPars {
+    padding-bottom: 80px;
+}
+
+div#myturnCountdown {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 5px;
+    font-size: 2em;
+    width: 20%;
+    height: 20%;
+    text-align: center;
+}
+
+footer.footer>div.footerText {
+    position: absolute;
+    left: 80px;
+    right: 0;
+    height: 100%;
+    padding: 20px 10px;
+    font-size: medium;
+    /* text-align: center; */
+}
+
+footer.footer>div.buts {
+    position: absolute;
+    left: 80px;
+    right: 0;
+    height: 100%;
+    padding: 5px;
+    font-size: medium;
+    display: none;
+}
+
+div#myturnModal>a#endBut {
+    bottom: 40%;
+    left: 50%;
+    margin-left: -20%;
 }

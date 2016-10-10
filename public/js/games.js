@@ -6,14 +6,14 @@ LGamesClient.Games = {};
 LGamesClient.Game = (function(){
   var Game = function(name,userAvatar){
     this.name = name;
-    this.socket = io('/' + this.name);
+    this.socket;
     this.players = [];
     this.myPlayer = {
       id: '',
       avatar: userAvatar
     };
     this.footer = $('footer.footer')
-    this._initSocketEvents();
+    this._initSocket();
   }
 
   var _api = {
@@ -22,7 +22,8 @@ LGamesClient.Game = (function(){
       this.socket.emit('newPlayer', this.myPlayer);
     },
 
-    _initSocketEvents: function(){
+    _initSocket: function(){
+      this.socket = io('/' + this.name);
       this.socket.on('connect', this._onConnect.bind(this));
     },
 
@@ -30,6 +31,15 @@ LGamesClient.Game = (function(){
       for (var i = 0; i < this.players.length; i++) {
         if(this.players[i].id == playerId){
           return this.players[i];
+        }
+      }
+      return null;
+    },
+
+    getPlayerIndexById: function(playerId){
+      for (var i = 0; i < this.players.length; i++) {
+        if(this.players[i].id == playerId){
+          return i;
         }
       }
       return null;

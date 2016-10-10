@@ -11,8 +11,8 @@
 
       var _api = {
 
-        _initSocketEvents: function(){
-          LGamesClient.Game.prototype._initSocketEvents.call(this);
+        _initSocket: function(){
+          LGamesClient.Game.prototype._initSocket.call(this);
           
           this.socket.on('timeTick', this._onTimeTick.bind(this));
           this.socket.on('newOperation', this._onNewOperation.bind(this));

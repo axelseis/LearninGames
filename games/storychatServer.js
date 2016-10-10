@@ -15,7 +15,7 @@ var begins = [
 var StoryChat = function(){
   this.gameIO;
   this.players = [];
-  this.actPlayer;
+  this.actPlayerIndex;
  
   this.begins = begins;
   this.lastBegins = [];
@@ -29,8 +29,10 @@ StoryChat.prototype = {
   
   _onClientConnected: function(client){
     client.on("newPlayer", this._onNewPlayer.bind(this,client));
-    client.on("playerPar", this._onPlayerPar.bind(this,client.conn.id));    
-    client.on("playerVoteEnd", this._onPlayerVoteEnd.bind(this,client.conn.id));    
+    client.on("playerDismiss", this._onPlayerDismiss.bind(this));    
+    client.on("TheEnd", this._onTheEnd.bind(this));    
+    client.on("playerWrite", this._onPlayerWrite.bind(this));    
+    client.on("playerEndsWrite", this._onPlayerEndsWrite.bind(this));    
     client.on("disconnect", this._onPlayerLeaveGame.bind(this,client.conn.id));
   },
 
@@ -40,23 +42,45 @@ StoryChat.prototype = {
     playerSocket.emit('enterGame', this.players, this.story);
     playerSocket.broadcast.emit('newPlayer', player);
 
-    if(this.players.length == 1){
-      this._newGame();
+    if(!this.story.length){
+      this._newStory();
+    }
+    if(this.actPlayerIndex == null){
+      this._setNextPlayer2Write();
+    }
+    else{
+      this._onPlayerWrite(this.players[this.actPlayerIndex].id, 'waiting...');
     }
   },
 
-  _onPlayerPar: function(playerId,paragraph) {
-    var newPar = [paragraph,playerId]
-    
-    this.story.push(newPar);
-    this.gameIO.emit('playerPar',newPar);
+  _onPlayerWrite: function(playerId,text) {
+    var newPar = [playerId,text]
+    this.gameIO.emit('playerWrite',newPar);
   },
 
-  _onPlayerVoteEnd: function(playerId) {
-    //Send message to all players and wait for their votes
+  _onPlayerEndsWrite: function(playerId, playerPar) {
+    this.story.push(playerPar);
+    this._setNextPlayer2Write();
+  },
+
+  _onPlayerDismiss: function(playerId) {
+    this.gameIO.emit('playerDismiss', this.players[this.actPlayerIndex].id);
+    this._setNextPlayer2Write();
+  },
+
+  _onTheEnd: function(playerId, playerPar) {
+    this.gameIO.emit('TheEnd', playerPar);
+
+    this.story = [];
+
+    while(this.players.length){ //when disconnect, fires _onPlayerLeaveGame
+      this.gameIO.connected['/storychat#' + this.players[0].id].disconnect();
+    }
   },
 
   _onPlayerLeaveGame: function(playerId) {
+    var actPlayerId = this.actPlayerIndex != null ? this.players[this.actPlayerIndex].id : null;
+
     for (var i = 0; i < this.players.length; i++) {
       if( playerId.indexOf(this.players[i].id) != -1){
         this.gameIO.emit('removePlayer', this.players[i].id);
@@ -66,7 +90,10 @@ StoryChat.prototype = {
     }
 
     if(!this.players.length){
-      //this.endStory();
+      this.actPlayerIndex = null;
+    }
+    else if(this.story.length && (this.actPlayerIndex == null || playerId == actPlayerId)){
+      this._setNextPlayer2Write();
     }
   },
  
@@ -84,42 +111,25 @@ StoryChat.prototype = {
     return this.begins[beginN];
   },
 
-  _newGame: function(){
+  _newStory: function(){
     var newBegin = this._getRandomBegin();
 
     this.story = [newBegin];
-    this.actPlayer = null;
+    this.actPlayerIndex = null;
 
     this.gameIO.emit('newStory',this.story);
     this.playersVotedEnd = 0;
-
-    this._setNextPlayer2Write();
   },
 
-  _setNextPlayer2Write: function(){
-    if(!this.actPlayer || this.players.indexOf(this.actPlayer) == this.players.length){
-      this.actPlayer = this.players[0];
+  _setNextPlayer2Write: function(){ 
+    if(this.actPlayerIndex == null || this.actPlayerIndex >= this.players.length-1){
+      this.actPlayerIndex = 0;
     }
     else{
-      this.actPlayer = this.players[this.players.indexOf(this.actPlayer)+1];
+      this.actPlayerIndex++ ;
     }
 
-    this.gameIO.emit('newPlayer2Write', this.actPlayer.id);
-
-    //var playerSocket = this.gameIO.connected['/storychat#' + this.actPlayer.id];
-    //console.log('this.gameIO.connected', this.gameIO.connected);
-  },
-
-  _setTime: function(){
-    var sendSol = false;
-
-    if(this.timeLeft < 0){
-      this._newGame();
-    }
-    else if(this.timeLeft == 0){
-      sendSol = this.actSol;
-    }
-    this.gameIO.emit('timeTick', this.timeLeft--, sendSol);
+    this.gameIO.emit('nextPlayer2Write', this.players[this.actPlayerIndex].id);
   },
 
   init: function(io){

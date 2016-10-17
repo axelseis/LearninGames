@@ -372,3 +372,11 @@ div#myturnModal>a#endBut {
     left: 50%;
     margin-left: -20%;
 }
+
+div#all div.container {
+    max-width: 100%;
+}
+
+div#all {
+    max-width: 700px;
+}

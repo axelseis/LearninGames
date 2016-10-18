@@ -52,7 +52,7 @@
       detector,
       detections;
 
-  var mindetections = 15;
+  var mindetections = 1500000;
 
   var videObj = $('video');
   var video = videObj.get(0);
@@ -76,6 +76,7 @@
       video.src = null;
       cameraStream.getTracks()[0].stop();
     }
+    marco.hide();
   };
 
   function gotSources(sourceInfos) {
@@ -139,8 +140,10 @@
   //objectdetect
   function captureFace(){
     var terminated;
+
+    window.scrollTo(0,document.body.scrollHeight);
+
     if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
-            
       if (!detector) {
         var width = ~~(60 * video.videoWidth / video.videoHeight);
         var height = 60;

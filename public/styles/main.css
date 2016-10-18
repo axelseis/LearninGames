@@ -386,13 +386,19 @@ div#all div.container {
 
 div#all {
     max-width: 700px;
+    padding: 0;
 }
 
 div.avatar>a>img {
     width: 100%;
-    max-width: 150px;
+    max-width: 100px;
     border-radius: 50%;
+    border-color: #171516;
+    border-style: solid;
+    /* border-width: 4px; */
 }
+
+img {}
 
 .container.vertical-center.vcard {
     background-color: #f1efed;
@@ -404,6 +410,7 @@ div.avatar>a>img {
 
 .links {
     margin: 10px 0 40px 0;
+    height: 40px;
 }
 
 nav.navbar.navbar-default.navbar-fixed-top {

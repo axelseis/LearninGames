@@ -12,8 +12,15 @@
 }
 */
 
+@media (min-width: 768px) {
+  .container {
+      width: auto !important;
+  }
+}
+
 html, body {
 	height: 100%;
+	min-width: 300px;
 }
 
 
@@ -379,4 +386,26 @@ div#all div.container {
 
 div#all {
     max-width: 700px;
+}
+
+div.avatar>a>img {
+    width: 100%;
+    max-width: 150px;
+    border-radius: 50%;
+}
+
+.container.vertical-center.vcard {
+    background-color: #f1efed;
+}
+
+.links>a.link {
+    margin: 10px;
+}
+
+.links {
+    margin: 10px 0 40px 0;
+}
+
+nav.navbar.navbar-default.navbar-fixed-top {
+    min-width: 300px;
 }

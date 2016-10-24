@@ -52,11 +52,8 @@ StoryChat.prototype = {
       this._setNextPlayer2Write(player.room);
     }
     else{
-      console.log('alguien está escribiendo: ', this.players[player.room][this.actPlayerIndex[player.room]])
       //playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, 'waiting...']);
-
       playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, 'waiting...']);
-
       //this._onPlayerWrite(playerSocket, 'waiting...');
     }
   },

@@ -18,6 +18,10 @@
   var server = app.listen(port);
   var io = socketIO.listen(server);
 
+  var missingletter = require('./games/missingletterServer.js');  
+  var missingnumber = require('./games/missingnumberServer.js');  
+  var storychat = require('./games/storychatServer.js');  
+
   console.log("listening on " + port + "!");
 
   //===============PASSPORT===============
@@ -74,6 +78,7 @@
     queryParameter: 'lang',
     cookie: 'locale',
     directory: "" + __dirname + "/locales",
+    register: storychat
   });
 
   // Configure express to use handlebars templates
@@ -104,16 +109,13 @@
   //===============GAMES===============
   
   //MissingLet_er
-  var missingletter = require('./games/missingletterServer.js');  
-  missingletter.init(io,i18n);
+  missingletter.init(io);
 
   //MissingNumb3r
-  var missingnumber = require('./games/missingnumberServer.js');  
-  missingnumber.init(io,i18n);
+  missingnumber.init(io);
 
   //StoryChat
-  var storychat = require('./games/storychatServer.js');  
-  storychat.init(io,i18n);
+  storychat.init(io);
 
 
 

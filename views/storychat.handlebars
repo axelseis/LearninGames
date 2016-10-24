@@ -8,16 +8,16 @@
       <div id="usersPars"></div>
     </div>
     <div id="myturnModal">
-      <h1>It's your turn</h1>
+      <h1>{{{__ "It's your turn"}}}</h1>
       <div id="myturnCountdown"></div>
       <a id="endBut" href="#" class="btn btn-warning btn-block" role="button">
-        <span class="glyphicon glyphicon-heart-empty"></span> THE END
+        <span class="glyphicon glyphicon-heart-empty"></span> {{{__ "THE END"}}}
       </a>
       <a id="dismissBut" href="#" class="btn btn-danger btn-block" role="button">
-        <span class="glyphicon glyphicon-remove-sign"></span> Dismiss
+        <span class="glyphicon glyphicon-remove-sign"></span> {{{__ "Dismiss"}}}
       </a>
       <a id="writeBut" href="#" class="btn btn-success btn-block" role="button">
-        <span class="glyphicon glyphicon-ok-sign"></span> OK, go write
+        <span class="glyphicon glyphicon-ok-sign"></span> {{{__ "OK, go write"}}}
       </a>
     </div>
   </div>
@@ -26,15 +26,18 @@
     <div class="footerText"></div>
     <div class="buts">
       <a id="newStoryBut" href="#" class="btn btn-success btn-block" role="button">
-        <span class="glyphicon glyphicon-play-circle"></span> New Story
+        <span class="glyphicon glyphicon-play-circle"></span> {{{__ "New Story"}}}
       </a>
       <a id="downloadBut" href="#" class="btn btn-warning btn-block" role="button">
-        <span class="glyphicon glyphicon-circle-arrw-down"></span> Download
+        <span class="glyphicon glyphicon-circle-arrow-down"></span> {{{__ "Download"}}}
       </a>      
     </div>
   </footer>
 
   <script>
+    var waitingText = '{{{__ "waiting..."}}}';
+    var nextplayText = '{{{__ "You are the next"}}}';
+    var turnsText = '{{{__ "turns to you"}}}';
 
     var game = new LGamesClient.Games.StoryChat('{{user.avatar}}');
     game.init();

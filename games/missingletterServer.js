@@ -172,7 +172,7 @@ MissingLetter.prototype = {
     this.gameIO.in(room).emit('timeTick', this.timeLeft[room]--, sendSol);
   },
 
-  init: function(io,i18n){
+  init: function(io){
     this.gameIO = io.of('/missinglet_er');
     this.gameIO.on("connection", this._onClientConnected.bind(this));    
   }

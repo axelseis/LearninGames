@@ -65,7 +65,7 @@
           this.actPlayerId = newPlayerId;
           this.actPlayerPar = this.actPlayerParTemplate.clone();
           this.actPlayerPar.children('.playerAvatar').attr('src', newPlayer.avatar);
-          this.actPlayerPar.children('.par').html('waiting ...');
+          this.actPlayerPar.children('.par').html(waitingText);
 
           this.usersPars.append(this.actPlayerPar);
 
@@ -81,7 +81,7 @@
             var myindex = this.getPlayerIndexById(this.myPlayer.id)
             var turns2me =  myindex > actplayerIndex ? myindex - actplayerIndex : this.players.length - actplayerIndex +myindex;
 
-            this.footerText.html(turns2me == 1 ? 'You are the next' : turns2me + ' turns to you');
+            this.footerText.html(turns2me == 1 ? nextplayText : turns2me + ' ' + turnsText);
           }
         },
 
@@ -117,7 +117,7 @@
         },
 
         _onClickEndBut: function(event){
-          this.actPlayerPar.children('.par').html('THE END');
+          this.actPlayerPar.children('.par').html(this.myturnModal.children('#endBut').text());
 
           this.footer.show();
           this.myturnModal.hide();    

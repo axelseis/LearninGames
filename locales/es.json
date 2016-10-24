@@ -9,5 +9,14 @@
 	"MissingNumb3r": "Falta Un Número",
 	"StoryChat": "Sigue El Cuento",
 	"Comming soon": "Próximamente ...",
-	"logout": "salir"
+	"logout": "salir",
+	"waiting...": "esperando...",
+	"THE END": "FIN",
+	"Dismiss": "Paso el turno",
+	"OK, go write": "Voy a escribir",
+	"It's your turn": "Te toca",
+	"New Story": "Empezamos uno nuevo",
+	"Download": "Descargar el cuento",
+	"You are the next": "Eres el siguiente",
+	"turns to you": "escritores antes que tu"
 }

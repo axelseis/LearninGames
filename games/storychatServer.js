@@ -53,7 +53,7 @@ StoryChat.prototype = {
     }
     else{
       //playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, 'waiting...']);
-      playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, 'waiting...']);
+      playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, this.__('waiting...')]);
       //this._onPlayerWrite(playerSocket, 'waiting...');
     }
   },

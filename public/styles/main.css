@@ -416,3 +416,16 @@ img {}
 nav.navbar.navbar-default.navbar-fixed-top {
     min-width: 300px;
 }
+
+footer.footer.langsselector {
+    height: 40px;
+}
+
+.langs {
+    display: inline-block;
+    padding: 10px;
+}
+
+.langs.selected {
+    background-color: #bfbfbf;
+}

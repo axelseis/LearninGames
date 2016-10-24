@@ -28,7 +28,9 @@
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.2",
     "q": "^1.0.1",
-    "an-array-of-english-words": "*"
+    "i18n": "*",
+    "an-array-of-english-words": "*",
+    "an-array-of-spanish-words": "*"
   },
   "keywords": [
     "node",

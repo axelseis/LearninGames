@@ -21,6 +21,13 @@ LGamesClient.Main = (function(){
   return{
       init: function(){
         overlay = $('#overlay');
+
+        $('.langs[lang=' + Cookies.get('locale') + ']').addClass('selected')
+        $('.langs').click(function(event) {
+          Cookies.set('locale', $(this).attr('lang'));
+          location.reload(true);          
+          //window.location = window.location.href.split('?')[0] + '?lang=' + $(this).attr('lang');
+        });
         //window.addEventListener('resize', onResize);
 
         //onResize();
@@ -28,7 +35,7 @@ LGamesClient.Main = (function(){
   };
 })();
 
-LGamesClient.Main.init();
+//LGamesClient.Main.init();
 
 $( document ).ready(function(){
   LGamesClient.Main.init();

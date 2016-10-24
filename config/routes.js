@@ -16,6 +16,7 @@ module.exports = function(app, passport){
 
 	//displays our homepage
 	app.get('/', function(req, res){
+	    res.cookie('locale', res.getLocale(), { maxAge: 900000, httpOnly: false });
 	    if (req.isAuthenticated()){
 		  	res.redirect('/games');
 	    }
@@ -111,25 +112,26 @@ module.exports = function(app, passport){
 	// =====================================
 
 	app.get('/games', isLoggedIn, function(req, res){
-	  res.locals.ingame = null;
+	  res.cookie('locale', res.getLocale(), { maxAge: 900000, httpOnly: false });
+	  res.locals.ingame = false;
 	  res.render('games', {user: req.user});
 	});
 
 	//missing letter
 	app.get('/games/missingletter', isLoggedIn, function(req, res){
-	  res.locals.ingame = 'MissingLet_er';
+	  res.locals.ingame = res.__('MissingLet_er');
 	  res.render('missingletter', {user: req.user});
 	});
 
 	//missing number
 	app.get('/games/missingnumber', isLoggedIn, function(req, res){
-	  res.locals.ingame = 'MissingNumb3r';
+	  res.locals.ingame = res.__('MissingNumb3r');
 	  res.render('missingnumber', {user: req.user});
 	});
 
 	//story chat
 	app.get('/games/storychat', isLoggedIn, function(req, res){
-	  res.locals.ingame = 'StoryChat';
+	  res.locals.ingame = res.__('StoryChat');
 	  res.render('storychat', {user: req.user});
 	});
 

@@ -56,6 +56,7 @@
         },
 
         _onEnterGame: function(initPlayers){
+            console.log('_onEnterGame: ', initPlayers);
           this.players = initPlayers;
           this.playersContainer.empty();
           

@@ -10,6 +10,7 @@ LGamesClient.Game = (function(){
     this.players = [];
     this.myPlayer = {
       id: '',
+      room: Cookies.get('locale'),
       avatar: userAvatar
     };
     this.footer = $('footer.footer')

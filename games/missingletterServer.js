@@ -1,37 +1,37 @@
 
 
-
-var words = require("an-array-of-english-words");
+var wordsEN = require("an-array-of-english-words");
+var wordsES = require("an-array-of-spanish-words");
 var letters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','t','u','v','w','x','y','z'];
-
-get4RandomLetters = function(excludeletter,templateWord){
-  var rand = [];
-  var tempLetter = letters[Math.floor(Math.random()*100)];
-  while(rand.length < 5){
-    while(words.indexOf(templateWord.replace('_',tempLetter)) != -1 || rand.indexOf(tempLetter) != -1){
-      tempLetter = letters[Math.floor(Math.random()*100)];
-    }
-    rand.push(tempLetter);
-  }
-  return rand;
-}
 
 var MissingLetter = function(){
   this.gameIO;
-  this.players = [];
-  this.playersEnded = 0;
+  this.players = {};
+  this.playersEnded = {
+    en: 0,
+    es: 0
+  };
 
-  this.words = words;
-  this.lastWords = [];
-  this.actWord;
-  this.actSol;
+  this.words = {
+    en: wordsEN,
+    es: wordsES
+  };
+
+  this.letters = {
+    en: letters,
+    es: letters.concat(['ñ','á','é','í','ó','ú'])
+  }
+
+  this.lastWords = {en:[],es:[]};
+  this.actWord = {};
+  this.actSol = {};
 
   this.maxTime = 10;
   this.winTime = 3;
-  this.timeLeft;
-  this.timeTick;
+  this.timeLeft = {};
+  this.timeTick = {};
 
-  this.solved;
+  this.solved = [];
 }
 
 
@@ -39,116 +39,141 @@ MissingLetter.prototype = {
   
   _onClientConnected: function(client){
     client.on("newPlayer", this._onNewPlayer.bind(this,client));
-    client.on("playerSol", this._onPlayerSolution.bind(this,client.conn.id));    
-    client.on("disconnect", this._onPlayerLeaveGame.bind(this,client.conn.id));
+    client.on("playerSol", this._onPlayerSolution.bind(this,client));    
+    client.on("disconnect", this._onPlayerLeaveGame.bind(this,client));
   },
 
   _onNewPlayer: function(playerSocket, player){
-    this.players.push(player);
+    playerSocket.gameRoom = player.room
+    playerSocket.join(player.room);
 
-    playerSocket.emit('enterGame', this.players);
-    playerSocket.broadcast.emit('newPlayer', player);
+    if(!this.players[player.room]){
+      this.players[player.room] = [];
+    }
+    this.players[player.room].push(player);
 
-    if(this.players.length == 1){
-      this._newGame();
+    playerSocket.emit('enterGame', this.players[player.room]);
+    playerSocket.broadcast.in(player.room).emit('newPlayer', player);
+
+    if(this.players[player.room].length == 1){
+      this._newGame(player.room);
     }
     else{
-      playerSocket.emit('newWord', this.actWord);      
+      playerSocket.emit('newWord', this.actWord[player.room]);      
     }
   },
 
-  _onPlayerSolution: function(playerId,solution) {
-    if(solution == this.actSol){
-      if(!this.solved){
-        this._playerWins(playerId);
+  _onPlayerSolution: function(playerSocket,solution) {
+    var playerId = playerSocket.conn.id;
+    var playerRoom = playerSocket.gameRoom;
+    
+    if(solution == this.actSol[playerRoom]){
+      if(!this.solved[playerRoom]){
+        this._playerWins(playerId,playerRoom);
       }
       else{
-        this.gameIO.emit('playerSol',[playerId,'ok']);
+        this.gameIO.in(playerRoom).emit('playerSol',[playerId,'ok']);
       }
     }
     else{
-      this.gameIO.emit('playerSol',[playerId,'ko']);
+      this.gameIO.in(playerRoom).emit('playerSol',[playerId,'ko']);
     }
 
-    if(this.playersEnded++ == this.players.length-1){
-      this.timeLeft = 0;
+    if(this.playersEnded[playerRoom]++ == this.players[playerRoom].length-1){
+      this.timeLeft[playerRoom] = 0;
     }
   },
 
-  _onPlayerLeaveGame: function(playerId) {
-    for (var i = 0; i < this.players.length; i++) {
-      if( playerId.indexOf(this.players[i].id) != -1){
-        this.gameIO.emit('removePlayer', this.players[i].id);
-        this.players.splice(i,1);
+  _onPlayerLeaveGame: function(playerSocket) {
+    var playerId = playerSocket.conn.id;
+    var playerRoom = playerSocket.gameRoom;
+
+    for (var i = 0; i < this.players[playerRoom].length; i++) {
+      if( playerId.indexOf(this.players[playerRoom][i].id) != -1){
+        this.gameIO.in(playerRoom).emit('removePlayer', this.players[playerRoom][i].id);
+        this.players[playerRoom].splice(i,1);
         break;
       }
     }
 
-    if(!this.players.length){
-      clearInterval(this.timeTick);
-      this.timeTick = null;
+    if(!this.players[playerRoom].length){
+      clearInterval(this.timeTick[playerRoom]);
+      this.timeTick[playerRoom] = null;
     }
   },
  
-  _getRandomWord: function(){
+  _get4RandomLetters: function(excludeletter,templateWord,lang){
+    var rand = [];
+    var tempLetter = this.letters[lang][Math.floor(Math.random()*this.letters[lang].length)];
+
+    while(rand.length < 4){
+      while(this.words[lang].indexOf(templateWord.replace('_',tempLetter)) != -1 || rand.indexOf(tempLetter) != -1){
+        tempLetter = this.letters[lang][Math.floor(Math.random()*this.letters[lang].length)];
+      }
+      rand.push(tempLetter);
+    }
+    return rand;
+  },
+
+  _getRandomWord: function(lang){
     var wordN;
     do{
-      wordN = Math.floor(Math.random()*this.words.length);      
+      wordN = Math.floor(Math.random()*this.words[lang].length);      
     }
-    while(this.lastWords.indexOf(wordN) != -1);
+    while(this.lastWords[lang].indexOf(wordN) != -1);
 
-    var word = this.words[wordN];
-    var letterN = Math.floor(Math.random()*this.words[wordN].length);
+    var word = this.words[lang][wordN];
+    var letterN = Math.floor(Math.random()*this.words[lang][wordN].length);
     var letter = word.charAt(letterN);
     var templateWord = word.substr(0, letterN) + '_' + word.substr(letterN+1);
-    var filled = get4RandomLetters(letter,templateWord).concat(letter).sort(function(){return 0.5 - Math.random()});
+    var filled = this._get4RandomLetters(letter,templateWord,lang).concat(letter).sort(function(){return 0.5 - Math.random()});
 
-    this.lastWords.push(wordN);
-    if(this.lastWords.length > 200){
-      this.lastWords.shift();
+    this.lastWords[lang].push(wordN);
+    if(this.lastWords[lang].length > 200){
+      this.lastWords[lang].shift();
     }
     return [[templateWord, filled],letter];
   },
 
-  _newGame: function(){
-    var newWord = this._getRandomWord();
+  _newGame: function(room){
+    var newWord = this._getRandomWord(room);
 
-    this.actWord = newWord[0];
-    this.actSol = newWord[1];
+    this.actWord[room] = newWord[0];
+    this.actSol[room] = newWord[1];
 
-    this.gameIO.emit('newWord',this.actWord);
+    this.gameIO.in(room).emit('newWord',this.actWord[room]);
 
-    this.solved = false;
-    this.playersEnded = 0;
-    this.timeLeft = this.maxTime;
-    this._setTime();
+    this.solved[room] = false;
+    this.playersEnded[room] = 0;
+    this.timeLeft[room] = this.maxTime;
+    this._setTime(room);
 
-    if(!this.timeTick){
-      this.timeTick = setInterval(this._setTime.bind(this),1000);
+    if(!this.timeTick[room]){
+      this.timeTick[room] = setInterval(this._setTime.bind(this,room),1000);
     }
   },
 
-  _playerWins: function(playerId){
-    this.solved = true;
-    this.timeLeft = this.winTime;
+  _playerWins: function(playerId, playerRoom){
+    this.solved[playerRoom] = true;
+    this.timeLeft[playerRoom] = this.winTime;
     
-    this.gameIO.emit('playerWins',playerId);
+    this.gameIO.in(playerRoom).emit('playerWins',playerId);
   },
 
-  _setTime: function(){
+  _setTime: function(room){
     var sendSol = false;
 
-    if(this.timeLeft < 0){
-      this._newGame();
+    if(this.timeLeft[room] < 0){
+      this._newGame(room);
     }
-    else if(this.timeLeft == 0){
-      sendSol = this.actSol;
+    else if(this.timeLeft[room] == 0){
+      sendSol = this.actSol[room];
     }
-    this.gameIO.emit('timeTick', this.timeLeft--, sendSol);
+    this.gameIO.in(room).emit('timeTick', this.timeLeft[room]--, sendSol);
   },
 
-  init: function(io){
-    this.gameIO = io.of('/missinglet_er')
+  init: function(io,i18n){
+    this.gameIO = io.of('/missinglet_er');
     this.gameIO.on("connection", this._onClientConnected.bind(this));    
   }
 }

@@ -8,6 +8,7 @@
       bodyParser = require('body-parser'),
       methodOverride = require('method-override'),
       //session = require('express-session'),
+      i18n = require('i18n'),
       session = require('cookie-session'),
       passport = require('passport'),
       socketIO = require('socket.io');
@@ -36,6 +37,7 @@
   app.use(session({secret: 'hateosca', saveUninitialized: true, resave: true}));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(i18n.init);
 
   app.enable('trust proxy');
 
@@ -64,13 +66,30 @@
     next();
   });
 
+  //i18n
+  i18n.configure({
+    locales: ['en', 'es'],
+    autoReload: true,
+    //defaultLocale: 'es',
+    queryParameter: 'lang',
+    cookie: 'locale',
+    directory: "" + __dirname + "/locales",
+  });
+
   // Configure express to use handlebars templates
   var hbs = exphbs.create({
       defaultLayout: 'main', 
+      helpers: {
+        __: function () {
+          return i18n.__.apply(this, arguments);
+        },
+        __n: function () {
+          return i18n.__n.apply(this, arguments);
+        }
+      }
   });
   app.engine('handlebars', hbs.engine);
   app.set('view engine', 'handlebars');
-
 
   //===============ROUTES===============
 
@@ -86,15 +105,15 @@
   
   //MissingLet_er
   var missingletter = require('./games/missingletterServer.js');  
-  missingletter.init(io);
+  missingletter.init(io,i18n);
 
   //MissingNumb3r
   var missingnumber = require('./games/missingnumberServer.js');  
-  missingnumber.init(io);
+  missingnumber.init(io,i18n);
 
   //StoryChat
   var storychat = require('./games/storychatServer.js');  
-  storychat.init(io);
+  storychat.init(io,i18n);
 
 
 

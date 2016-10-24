@@ -25,23 +25,24 @@
 
         _onTimeTick: function(newTime,showSol){
           this.time.html(newTime);
-          this.time.fitText(0.15);
+          //this.time.bigtext();
 
           if(showSol){
-          	this.operation.html(this.operation.html().replace('_','<span class="sol">' + showSol + '</span>'));
+          	this.operation.html('<p>' + this.operation.text().replace('_','<span class="sol">' + showSol + '</span>') + '</p>');
+            this.operation.bigtext({maxfontsize: 60});
           }
         },
 
         _onClickNumber: function(event) {
-			var number = $(event.currentTarget);
+    			var number = $(event.currentTarget);
 
-			number.attr('sol', 'true');
-			this._sendSolution(number.html());
-		},
+    			number.attr('sol', 'true');
+    			this._sendSolution(number.html());
+    		},
 
         _onNewOperation: function(newOperation){
-            this.operation.html(newOperation[0]);
-            this.operation.fitText(0.5);
+            this.operation.html('<p>' + newOperation[0].replace('*','x') + '</p>');
+            this.operation.bigtext({maxfontsize: 60});
 
             this.playersContainer.children('.player').removeAttr('sol');
             this.numbers.empty();

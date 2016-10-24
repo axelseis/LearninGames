@@ -120,7 +120,7 @@ MissingLetter.prototype = {
     do{
       wordN = Math.floor(Math.random()*this.words[lang].length);      
     }
-    while(this.lastWords[lang].indexOf(wordN) != -1);
+    while(this.lastWords[lang].indexOf(wordN) != -1 || this.words[lang][wordN].length < 4);
 
     var word = this.words[lang][wordN];
     var letterN = Math.floor(Math.random()*this.words[lang][wordN].length);

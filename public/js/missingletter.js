@@ -25,11 +25,11 @@
 
         _onTimeTick: function(newTime,showSol){
           this.time.html(newTime);
-          this.time.fitText(0.15);
+          //this.time.bigtext();
 
           if(showSol){
-          	this.word.html(this.word.html().replace('_','<span class="sol">' + showSol + '</span>'));
-            this.word.fitText(0.8);
+          	this.word.html('<p>' + this.word.text().replace('_','<span class="sol">' + showSol + '</span>') + '</p>');
+            this.word.bigtext({maxfontsize: 60});
           }
         },
 
@@ -41,8 +41,8 @@
     		},
 
         _onNewWord: function(newWord){
-            this.word.html(newWord[0]);
-            this.word.fitText(0.8);
+            this.word.html('<p>' + newWord[0] + '</p>');
+            this.word.bigtext({maxfontsize: 60});
 
             this.playersContainer.children('.player').removeAttr('sol');
             this.letters.empty();
@@ -56,7 +56,6 @@
         },
 
         _onEnterGame: function(initPlayers){
-            console.log('_onEnterGame: ', initPlayers);
           this.players = initPlayers;
           this.playersContainer.empty();
           

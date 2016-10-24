@@ -113,7 +113,7 @@
           this.myturnModal.hide();    
           window.clearInterval(this.countdownTO);
 
-          this.socket.emit('playerDismiss', this.myPlayer.id);
+          this.socket.emit('playerDismiss');
         },
 
         _onClickEndBut: function(event){
@@ -123,7 +123,7 @@
           this.myturnModal.hide();    
           window.clearInterval(this.countdownTO);
 
-          this.socket.emit('TheEnd', this.myPlayer.id, this.actPlayerPar.html());
+          this.socket.emit('TheEnd', this.actPlayerPar.html());
         },
 
         _onClickNewStoryBut: function(event){
@@ -167,11 +167,11 @@
         },
 
         _onKeyPress: function(event){
-          this.socket.emit('playerWrite', this.myPlayer.id, this.actPlayerPar.children('.par').html());
+          this.socket.emit('playerWrite', this.actPlayerPar.children('.par').html());
 
           if (event.keyCode === 13) { //ENTER
             this.actPlayerPar.children('.par').removeAttr('contenteditable');
-            this.socket.emit('playerEndsWrite', this.myPlayer.id, this.actPlayerPar.html());
+            this.socket.emit('playerEndsWrite', this.actPlayerPar.html());
 
             this.footer.show();
           }          

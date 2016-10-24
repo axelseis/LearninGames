@@ -68,6 +68,9 @@ img {
   background-color: #f5f5f5;
   left: 0;
   min-width: 300px;
+  border-color: #e7e7e7;
+  border-width: 1px 0 0;
+  border-style: solid;
 }
 
 .back-nav {
@@ -323,7 +326,7 @@ div#myturnModal>a#writeBut {
 .playerPar {
   width: 100%;
   min-height: 80px;
-  background-color: #f5f5f5;
+  background-color: #fbfafa;
   left: 0;
   margin-bottom: 10px;
   position: relative;

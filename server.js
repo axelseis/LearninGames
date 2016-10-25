@@ -7,8 +7,8 @@
       cookieParser = require('cookie-parser'),
       bodyParser = require('body-parser'),
       methodOverride = require('method-override'),
-      //session = require('express-session'),
       i18n = require('i18n'),
+      //session = require('express-session'),
       session = require('cookie-session'),
       passport = require('passport'),
       socketIO = require('socket.io');
@@ -75,10 +75,9 @@
     locales: ['en', 'es'],
     autoReload: true,
     //defaultLocale: 'es',
-    queryParameter: 'lang',
     cookie: 'locale',
     directory: "" + __dirname + "/locales",
-    register: storychat
+    register: [storychat, missingletter]
   });
 
   // Configure express to use handlebars templates

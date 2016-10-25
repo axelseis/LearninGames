@@ -26,6 +26,11 @@
 
         _onEnterGame: function(initPlayers, story){
           this.players = initPlayers;
+          
+          this.footer.show();
+          this.myturnModal.hide();    
+          window.clearInterval(this.countdownTO);
+          
           this._onNewStory(story);
         },
 
@@ -64,7 +69,7 @@
 
           this.actPlayerId = newPlayerId;
           this.actPlayerPar = this.actPlayerParTemplate.clone();
-          this.actPlayerPar.children('.playerAvatar').attr('src', newPlayer.avatar);
+          this.actPlayerPar.children('.playerAvatar').attr('src', newPlayer.avatar.replace(/&amp;/g,'&'));
           this.actPlayerPar.children('.par').html(waitingText);
 
           this.usersPars.append(this.actPlayerPar);

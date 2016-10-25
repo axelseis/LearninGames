@@ -33,41 +33,42 @@ StoryChat.prototype = {
   },
 
   _onNewPlayer: function(playerSocket, player){
-    playerSocket._gameRoom = player.room;
-    playerSocket.join(player.room);
+    var playerRoom = player.room || this.getLocale();
 
-    if(!this.players[player.room]){
-      this.players[player.room] = [];
+    playerSocket.join(playerRoom);
+    playerSocket.__playerRoom = playerRoom;
+
+    if(!this.players[playerRoom]){
+      this.players[playerRoom] = [];
     }
-    this.players[player.room].push(player);
+    this.players[playerRoom].push(player);
 
-    playerSocket.emit('enterGame', this.players[player.room], this.story[player.room]);
-    playerSocket.broadcast.in(player.room).emit('newPlayer', player);
+    playerSocket.emit('enterGame', this.players[playerRoom], this.story[playerRoom]);
+    playerSocket.broadcast.in(playerRoom).emit('newPlayer', player);
 
-    if(!this.story[player.room].length){
-      this._newStory(player.room);
+    if(!this.story[playerRoom].length){
+      this._newStory(playerRoom);
     }
     
-    if(this.actPlayerIndex[player.room] == null){
-      this._setNextPlayer2Write(player.room);
+        console.log('this.actPlayerIndex[playerRoom]', this.actPlayerIndex[playerRoom]);
+    if(this.actPlayerIndex[playerRoom] == null){
+      this._setNextPlayer2Write(playerRoom);
     }
     else{
-      //playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, 'waiting...']);
-      playerSocket.emit('playerWrite', [this.players[player.room][this.actPlayerIndex[player.room]].id, this.__('waiting...')]);
-      //this._onPlayerWrite(playerSocket, 'waiting...');
+      playerSocket.emit('playerWrite', [this.players[playerRoom][this.actPlayerIndex[playerRoom]].id, this.__('waiting...')]);
     }
   },
 
   _onPlayerWrite: function(playerSocket,text) {
     var playerId = playerSocket.conn.id;
-    var playerRoom = playerSocket._gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
     var newPar = [playerId,text]
 
     this.gameIO.in(playerRoom).emit('playerWrite',newPar);
   },
 
   _onPlayerEndsWrite: function(playerSocket, playerPar) {
-    var playerRoom = playerSocket._gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
 
     this.story[playerRoom].push(playerPar);
     this._setNextPlayer2Write(playerRoom);
@@ -75,18 +76,19 @@ StoryChat.prototype = {
 
   _onPlayerDismiss: function(playerSocket) {
     var playerId = playerSocket.conn.id;
-    var playerRoom = playerSocket._gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
     
     this.gameIO.in(playerRoom).emit('playerDismiss', playerId);
     this._setNextPlayer2Write(playerRoom);
   },
 
   _onTheEnd: function(playerSocket, playerPar) {
-    var playerRoom = playerSocket._gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
 
     this.gameIO.in(playerRoom).emit('TheEnd', playerPar);
 
     this.story[playerRoom] = [];
+    this.actPlayerIndex[playerRoom] = null;
 
     while(this.players[playerRoom].length){ //when disconnect, fires _onPlayerLeaveGame
       this.gameIO.connected['/storychat#' + this.players[playerRoom][0].id].disconnect();
@@ -95,16 +97,20 @@ StoryChat.prototype = {
 
   _onPlayerLeaveGame: function(playerSocket) {
     var playerId = playerSocket.conn.id;
-    var playerRoom = playerSocket._gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
+
     var actPlayerId = this.actPlayerIndex[playerRoom] != null ? this.players[playerRoom][this.actPlayerIndex[playerRoom]].id : null;
+    var playerIndex;
 
     for (var i = 0; i < this.players[playerRoom].length; i++) {
       if( playerId.indexOf(this.players[playerRoom][i].id) != -1){
-        this.gameIO.in(playerRoom).emit('removePlayer', this.players[playerRoom][i].id);
-        this.players[playerRoom].splice(i,1);
+        playerIndex = i;
         break;
       }
-    }
+    };
+
+    this.gameIO.in(playerRoom).emit('removePlayer', playerId);
+    this.players[playerRoom].splice(playerIndex,1);
 
     if(!this.players[playerRoom].length){
       this.actPlayerIndex[playerRoom] = null;

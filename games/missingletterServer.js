@@ -44,32 +44,37 @@ MissingLetter.prototype = {
   },
 
   _onNewPlayer: function(playerSocket, player){
-    playerSocket.gameRoom = player.room
-    playerSocket.join(player.room);
+    var playerRoom = player.room || this.getLocale();
 
-    if(!this.players[player.room]){
-      this.players[player.room] = [];
+    playerSocket.join(playerRoom);
+    playerSocket.__playerRoom = playerRoom;
+
+    if(!this.players[playerRoom]){
+      this.players[playerRoom] = [];
     }
-    this.players[player.room].push(player);
+    this.players[playerRoom].push(player);
 
-    playerSocket.emit('enterGame', this.players[player.room]);
-    playerSocket.broadcast.in(player.room).emit('newPlayer', player);
+    playerSocket.emit('enterGame', this.players[playerRoom]);
+    playerSocket.broadcast.in(playerRoom).emit('newPlayer', player);
 
-    if(this.players[player.room].length == 1){
-      this._newGame(player.room);
+    if(this.players[playerRoom].length == 1){
+      this._newGame(playerRoom);
     }
     else{
-      playerSocket.emit('newWord', this.actWord[player.room]);      
+      playerSocket.emit('newWord', this.actWord[playerRoom]);      
     }
   },
 
   _onPlayerSolution: function(playerSocket,solution) {
     var playerId = playerSocket.conn.id;
-    var playerRoom = playerSocket.gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
     
     if(solution == this.actSol[playerRoom]){
       if(!this.solved[playerRoom]){
-        this._playerWins(playerId,playerRoom);
+        this.solved[playerRoom] = true;
+        this.timeLeft[playerRoom] = this.winTime;
+        
+        this.gameIO.in(playerRoom).emit('playerWins',playerId);
       }
       else{
         this.gameIO.in(playerRoom).emit('playerSol',[playerId,'ok']);
@@ -86,7 +91,7 @@ MissingLetter.prototype = {
 
   _onPlayerLeaveGame: function(playerSocket) {
     var playerId = playerSocket.conn.id;
-    var playerRoom = playerSocket.gameRoom;
+    var playerRoom = playerSocket.__playerRoom;
 
     for (var i = 0; i < this.players[playerRoom].length; i++) {
       if( playerId.indexOf(this.players[playerRoom][i].id) != -1){
@@ -151,13 +156,6 @@ MissingLetter.prototype = {
     if(!this.timeTick[room]){
       this.timeTick[room] = setInterval(this._setTime.bind(this,room),1000);
     }
-  },
-
-  _playerWins: function(playerId, playerRoom){
-    this.solved[playerRoom] = true;
-    this.timeLeft[playerRoom] = this.winTime;
-    
-    this.gameIO.in(playerRoom).emit('playerWins',playerId);
   },
 
   _setTime: function(room){

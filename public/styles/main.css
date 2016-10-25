@@ -381,11 +381,11 @@ div#myturnCountdown {
     position: absolute;
     right: 0;
     top: 0;
-    padding: 5px;
+    padding: 5px 10px;
     font-size: 2em;
     width: 20%;
     height: 20%;
-    text-align: center;
+    text-align: right;
 }
 
 footer.footer>div.footerText {
@@ -454,8 +454,9 @@ div.avatar>a>img {
     align-items: center;
     text-align: center;
     max-width: 300px;
-    overflow-y: scroll;
-    padding-bottom: 100px;
+    /* overflow-y: scroll; */
+    padding-bottom: 50px;
+    padding-top: 65px;
 }
 
 .links>a.link {

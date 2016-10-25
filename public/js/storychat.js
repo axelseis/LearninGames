@@ -134,13 +134,17 @@
         },
 
         _onClickDownloadBut: function(event){
-          var storyText = this.begin.html();
+          var beginExport = this.begin.clone();
+          beginExport.find('i').remove();
+          
+          var storyText = beginExport.text() + '\n';
           this.usersPars.find('.par').each(function(index, el) {
-            storyText += '</br>' + $(this).html();
+            storyText += '\n' + $(this).text();
           });
+          
           $('<a/>').attr({
-              download: 'export.html', 
-              href: "data:text/html," + storyText 
+              download: 'story', 
+              href: "data:text/plain;charset=utf-8," + encodeURIComponent(storyText)
           })[0].click();
         },
 

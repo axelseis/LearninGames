@@ -83,6 +83,8 @@
 
             this.footerText.html(turns2me == 1 ? nextplayText : turns2me + ' ' + turnsText);
           }
+
+          this.storyContainer.parent().scrollTop(this.storyContainer.height());
         },
 
         _setCountdown: function(time){

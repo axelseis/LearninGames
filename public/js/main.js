@@ -39,4 +39,5 @@ LGamesClient.Main = (function(){
 
 $( document ).ready(function(){
   LGamesClient.Main.init();
+  LGamesClient.Home.init();
 });

@@ -26,17 +26,17 @@
 
     <div class="span2">
 
-      <a href="/auth/google" class="btn btn-danger btn-block" role="button">
+      <a href="/auth/google" class="btn btn-google btn-block" role="button">
         <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} Google
       </a>
       
-      <a href="/auth/facebook" class="btn btn-primary btn-block" role="button">
+      <a href="/auth/facebook" class="btn btn-facebook btn-block" role="button">
         <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} Facebook
       </a>
 
-      <a data-toggle="collapse" href="#videoCam" class="btn btn-warning btn-block" role="button">
+      <div id="cameraBut" class="btn btn-warning btn-block" role="button">
         <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} {{{__ "Camera"}}}
-      </a>
+      </div>
       <div id="videoCam" class="collapse container btn-warning" >
         <video class="camera" src=""></video>
       </div>      
@@ -49,152 +49,3 @@
 <canvas id="canvas"></canvas>
 <div id="marco"></div>
 
-<script>
-  var cameraStream, 
-      videoSource, 
-      detector,
-      detections;
-
-  var mindetections = 15;
-
-  var videObj = $('video');
-  var video = videObj.get(0);
-  var canvas = $('#canvas');
-  var marco = $('#marco');
-
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-  if (typeof navigator.mediaDevices === 'undefined' || typeof navigator.mediaDevices.enumerateDevices === 'undefined') {
-    //alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
-  } 
-  else {
-    navigator.mediaDevices.enumerateDevices(gotSources);
-  }
-
-  $('#videoCam').on('shown.bs.collapse', startCamera);
-  $('#videoCam').on('hidden.bs.collapse', stopCamera);
-
-  function stopCamera(){
-    if (cameraStream) {
-      video.src = null;
-      cameraStream.getTracks()[0].stop();
-    }
-    marco.hide();
-  };
-
-  function gotSources(sourceInfos) {
-    for(var i = 0; i < sourceInfos.length; i++) {
-      var si = sourceInfos[i];
-
-      if(si.kind === 'videoinput') {
-        videoSource = si.label || 'camera 1';
-        break;
-      }
-    }
-  }
-
-  function startCamera() {
-    var constraints = {
-      video: {
-        optional: [{
-          sourceId: videoSource
-        }]
-      }
-    };
-
-    window.scrollTo(0,document.body.scrollHeight);
-
-    detections = 0;
-    navigator.getUserMedia(constraints, successCallback, errorCallback);
-  }
-    
-  function successCallback(stream) {
-    var url = window.URL;
-    cameraStream = stream; 
-
-    if (url) {
-        video.src = url.createObjectURL(stream);
-    } else {
-        video.src = stream;
-    }
-
-    video.play();
-    setTimeout(captureFace,3000);
-  }
-
-  function errorCallback(error) {
-    console.log('navigator.getUserMedia error: ', error);
-  }
-
-  function sendImageToServer(){
-    var base64_image = canvas.get(0).toDataURL();
-    
-    $.ajax({
-      type: 'POST',
-      url: '/cameraLogin',
-      data: { 
-        'avatar': base64_image
-      },
-      success: function(msg){
-        window.location.href = '/games'
-        console.log('posted', msg);
-      }
-    });
-  }
-
-  //objectdetect
-  function captureFace(){
-    var terminated;
-
-    window.scrollTo(0,document.body.scrollHeight);
-
-    if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
-      if (!detector) {
-        var width = ~~(60 * video.videoWidth / video.videoHeight);
-        var height = 60;
-        detector = new objectdetect.detector(width, height, 1.1, objectdetect.frontalface_alt);
-      }
-            
-      var coords = detector.detect(video, 1);
-
-      if (coords[0]) {
-        var clip = coords[0];
-        var scaleX = videObj.width()/video.videoWidth;
-        var pos = videObj.offset();
-        var aspectX = video.videoWidth / detector.canvas.width;
-        var aspectY = video.videoHeight / detector.canvas.height;
-        
-        clip[0] *= aspectX*0.9;
-        clip[1] *= aspectY*0.9;
-        clip[2] *= aspectX*1.2;
-        clip[3] *= aspectY*1.2;
-
-        var rectW = Math.max(clip[2],clip[3]);
-        var rectX = Math.min(video.videoWidth, Math.max(0,clip[0]));
-        var rectY = Math.min(video.videoHeight, Math.max(0,clip[1]));
-       
-        marco.show();
-        marco.offset({left:rectX*scaleX + pos.left,top:rectY*scaleX + pos.top})
-        marco.width(rectW*scaleX);
-        marco.height(rectW*scaleX);
-        
-        if(detections++ == mindetections){
-          terminated = true;          
-
-          canvas.get(0).getContext('2d').clearRect(0,0,canvas.width(),canvas.height())
-          canvas.get(0).width = rectW;
-          canvas.get(0).height = rectW;
-          canvas.get(0).getContext('2d').drawImage(video, rectX,rectY,rectW,rectW, 0, 0, rectW, rectW);
-          
-          sendImageToServer();
-        }
-      }
-      else{
-        marco.hide();
-      }
-    }
-    if(!terminated){
-      window.requestAnimationFrame(captureFace);      
-    }
-  }
-</script>

@@ -11,7 +11,7 @@ LGamesClient.Main = (function(){
     var keyboard_shown = $(window).scrollTop() > 0;
 
     if(screenOrientation == 90 && !keyboard_shown){
-        overlay.show();      
+      overlay.show();      
     }
     else{
       overlay.hide();      
@@ -19,22 +19,25 @@ LGamesClient.Main = (function(){
   };
 
   return{
-      init: function(){
-        var langcookie = Cookies.get('locale') || window.navigator.userLanguage || window.navigator.language;
+    init: function(){
+      var langcookie = Cookies.get('locale') || window.navigator.userLanguage || window.navigator.language;
 
-        Cookies.set('locale', langcookie, {expires: 999});
+      Cookies.set('locale', langcookie, {expires: 999});
 
-        overlay = $('#overlay');
+      overlay = $('#overlay');
 
-        $('.langs[lang=' + langcookie + ']').addClass('selected')
-        $('.langs').click(function(event) {
-          Cookies.set('locale', $(this).attr('lang'), {expires: 999});
-          location.reload(true);          
-        });
-        //window.addEventListener('resize', onResize);
+      $('.langs[lang=' + langcookie + ']').addClass('selected');
+      $('.langs').click(function(event) {
+        Cookies.set('locale', $(this).attr('lang'), {expires: 999});
+        location.reload(true);          
+      });
+      //window.addEventListener('resize', onResize);
 
-        //onResize();
+      //onResize();
+      if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('js/service-worker.js');
       }
+    }
   };
 })();
 

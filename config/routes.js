@@ -137,12 +137,14 @@ module.exports = function(app, passport){
 
 
 	// =====================================
-	// 404
+	// 404 && offline
 	// =====================================
+
+	app.get('/offline', function(req,res){
+		res.render('offline', {user: req.user});
+	});
 
 	app.get('*', isLoggedIn, function(req,res){
 		res.redirect('/games');
 	});
-
-
 }

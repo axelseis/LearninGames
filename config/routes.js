@@ -34,7 +34,7 @@ module.exports = function(app, passport){
 	);
 	*/
 	app.get('/test', function(req, res){
-		res.render('test',{layout: false});
+		res.render('test', {layout: false});
 	 });
 
 	//CAMERA
@@ -141,7 +141,7 @@ module.exports = function(app, passport){
 	// =====================================
 
 	app.get('/offline', function(req,res){
-		res.render('offline', {user: req.user});
+		res.render('offline', {layout: false});
 	});
 
 	app.get('*', isLoggedIn, function(req,res){

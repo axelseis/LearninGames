@@ -10,31 +10,31 @@
       "density": 0.75
     },
     {
-      "src": "learningamesIcon-1x.png",
+      "src": "icons/learningamesIcon-1x.png",
       "sizes": "48x48",
       "type": "image/png",
       "density": 1.0
     },
     {
-      "src": "learningamesIcon-1-5x.png",
+      "src": "icons/learningamesIcon-1-5x.png",
       "sizes": "72x72",
       "type": "image/png",
       "density": 1.5
     },
     {
-      "src": "learningamesIcon-2x.png",
+      "src": "icons/learningamesIcon-2x.png",
       "sizes": "96x96",
       "type": "image/png",
       "density": 2.0
     },
     {
-      "src": "learningamesIcon-3x.png",
+      "src": "icons/learningamesIcon-3x.png",
       "sizes": "144x144",
       "type": "image/png",
       "density": 3.0
     },
     {
-      "src": "learningamesIcon-4x.png",
+      "src": "icons/learningamesIcon-4x.png",
       "sizes": "192x192",
       "type": "image/png",
       "density": 4.0

@@ -587,7 +587,7 @@ h4 {
     background-image: url("facebook-32.png");
 }
 
-div#cameraBut {
+div#cameraBut,div#iosBut {
     background-color: #fff;
     color: #777;
     background-image: url(screenshot-32.png);

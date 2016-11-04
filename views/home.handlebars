@@ -34,9 +34,9 @@
         <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} Facebook
       </a>
 
-      {{#if iOS}}
+      {{#if mobile}}
         <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" />
-        <div id="cameraBut" class="btn btn-warning btn-block" role="button">
+        <div id="iosBut" class="btn btn-warning btn-block" role="button">
           <label for="cameraInput"><span class="glyphicon glyphicon-user"></span>{{{__ "LogIn with"}}} {{{__ "Camera"}}}</label>
         </div>
       {{else}}

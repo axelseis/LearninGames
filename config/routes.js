@@ -16,7 +16,17 @@ module.exports = function(app, passport){
 
 	//displays our homepage
 	app.get('/', function(req, res){
+	    var ua = req.headers['user-agent'];
+		
+		if (/mobile/i.test(ua)){
+		    res.locals.mobile = true;
+		}
+		if (/like Mac OS X/.test(ua)) {
+		    res.locals.iOS = /CPU( iPhone)? OS ([0-9\._]+) like Mac OS X/.exec(ua)[2].replace(/_/g, '.');
+		}
+
 	    res.cookie('locale', res.getLocale(), { maxAge: 900000, httpOnly: false });
+	    
 	    if (req.isAuthenticated()){
 		  	res.redirect('/games');
 	    }

@@ -34,13 +34,20 @@
         <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} Facebook
       </a>
 
-      <div id="cameraBut" class="btn btn-warning btn-block" role="button">
-        <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} {{{__ "Camera"}}}
-      </div>
+      {{#if iOS}}
+        <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" />
+        <div id="cameraBut" class="btn btn-warning btn-block" role="button">
+          <label for="cameraInput"><span class="glyphicon glyphicon-user"></span>{{{__ "LogIn with"}}} {{{__ "Camera"}}}</label>
+        </div>
+      {{else}}
+        <div id="cameraBut" class="btn btn-warning btn-block" role="button">
+          <span class="glyphicon glyphicon-user"></span> {{{__ "LogIn with"}}} {{{__ "Camera"}}}
+        </div>
+      {{/if}}
       <div id="videoCam" class="collapse container btn-warning" >
         <video class="camera" src=""></video>
       </div>      
-
+      
     </div>
 
   </div>

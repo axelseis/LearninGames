@@ -6,7 +6,7 @@ var LGamesClient = {};
 LGamesClient.Main = (function(){
   var overlay;
 
-  onResize = function(ev){
+  var onResize = function(ev){
     var screenOrientation = ($(window).width() > $(window).height())? 90 : 0;
     var keyboard_shown = $(window).scrollTop() > 0;
 

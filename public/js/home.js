@@ -118,6 +118,8 @@ LGamesClient.Home = (function(){
 					canvas.width = rectW;
 					canvas.height = rectW;
 					canvas.getContext('2d').drawImage(canvasRef, rects[0][0],rects[0][1],rectW,rectW, 0, 0, rectW, rectW);
+
+					sendImageToServer();
 				}
 			}
 			

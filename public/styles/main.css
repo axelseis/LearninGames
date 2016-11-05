@@ -159,8 +159,20 @@ canvas#canvas {
     /* width: 300px; */
     /* height: 300px; */
     position: fixed;
-    /* top: 60px; */
+    top: 60px;
+    /* visibility: hidden; */
+    background-color: red;
+    z-index: 100;
+}
+
+canvas#canvasRef {
+    /* width: 300px; */
+    /* height: 300px; */
+    position: fixed;
+    top: 60px;
     visibility: hidden;
+    background-color: red;
+    z-index: 100;
 }
 
 div#marco {
@@ -182,6 +194,22 @@ div#videoCam {
     bottom: 30px;
     right: 0;
     display: none;
+}
+
+div#imageError {
+    position: fixed;
+    top: 61px;
+    left: 0;
+    background-color: rgba(191, 191, 191, 0.87);
+    padding: 20%;
+    bottom: 30px;
+    right: 0;
+    display: none;
+    font-size: 2em;
+}
+
+div#imageError.showing {
+    display: block;
 }
 
 div#videoCam.showing {

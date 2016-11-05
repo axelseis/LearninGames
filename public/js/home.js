@@ -8,10 +8,13 @@ LGamesClient.Home = (function(){
 		detections;
 
 	var videoWin,
+		iosBut,
 		videoBut,
 		videObj,
 		video,
 		canvas,
+		canvasRef,
+		imageError,
 		marco;
 
 	var mindetections = 15;
@@ -76,7 +79,7 @@ LGamesClient.Home = (function(){
 	};
 
 	function sendImageToServer(){
-		var base64_image = canvas.get(0).toDataURL();
+		var base64_image = canvas.toDataURL();
 
 		$.ajax({
 			type: 'POST',
@@ -89,6 +92,38 @@ LGamesClient.Home = (function(){
 			}
 		});
 	};
+
+	function captureIOSFace(ev){
+		if(ev.target.files.length == 1 && ev.target.files[0].type.indexOf("image/") == 0) {
+           	var image = new Image();
+           	var size = 250;
+           	var ctx = canvasRef.getContext('2d');
+           	var rects,rectW;
+			
+			image.onload = function() {
+				canvasRef.width = ~~(size * image.width / image.height);
+				canvasRef.height = ~~(size);
+				ctx.drawImage(image, 0, 0, canvasRef.width, canvasRef.height);
+				
+				detector = new objectdetect.detector(canvasRef.width, canvasRef.height, 1.1, objectdetect.frontalface_alt);
+				
+				rects = detector.detect(canvasRef, 1);
+				if(!rects.length){
+					imageError.addClass('showing');
+				}
+				else {
+					rectW = Math.max(rects[0][2],rects[0][3]);
+
+					canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height)
+					canvas.width = rectW;
+					canvas.height = rectW;
+					canvas.getContext('2d').drawImage(canvasRef, rects[0][0],rects[0][1],rectW,rectW, 0, 0, rectW, rectW);
+				}
+			}
+			
+			image.src = URL.createObjectURL(ev.target.files[0]);
+        }
+    };
 
 	function captureFace(){
 		var terminated;
@@ -128,10 +163,10 @@ LGamesClient.Home = (function(){
 				if(detections++ >= mindetections){
 					terminated = true;          
 
-					canvas.get(0).getContext('2d').clearRect(0,0,canvas.width(),canvas.height())
-					canvas.get(0).width = rectW;
-					canvas.get(0).height = rectW;
-					canvas.get(0).getContext('2d').drawImage(video, rectX,rectY,rectW,rectW, 0, 0, rectW, rectW);
+					canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height)
+					canvas.width = rectW;
+					canvas.height = rectW;
+					canvas.getContext('2d').drawImage(video, rectX,rectY,rectW,rectW, 0, 0, rectW, rectW);
 
 					sendImageToServer();
 				}
@@ -148,22 +183,31 @@ LGamesClient.Home = (function(){
   	return{
 		init: function(){
 			videoWin = $('#videoCam');
+			iosBut = $('#cameraInput');
 			videoBut = $('#cameraBut');
 			videObj = $('video');
 			video = videObj.get(0);
-			canvas = $('#canvas');
+			canvas = $('#canvas').get(0);
+			canvasRef = $('#canvasRef').get(0);
+			imageError = $('#imageError');
 			marco = $('#marco');
 
-      		videoBut.on('click', startStopCamera);
-      		videoWin.on('click', stopCamera);
+      		if(iosBut.length){
+	      		iosBut.on("change", captureIOSFace);      			
+      		}
+      		else{
+      			videoBut.on('click', startStopCamera);
+      			videoWin.on('click', stopCamera);
+	
+	  			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+				if (typeof navigator.mediaDevices === 'undefined' || typeof navigator.mediaDevices.enumerateDevices === 'undefined') {
+					//alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
+				} 
+				else {
+					navigator.mediaDevices.enumerateDevices(gotSources);
+				}
+      		}
 
-  			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-			if (typeof navigator.mediaDevices === 'undefined' || typeof navigator.mediaDevices.enumerateDevices === 'undefined') {
-				//alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
-			} 
-			else {
-				navigator.mediaDevices.enumerateDevices(gotSources);
-			}
       	}
   	};
 })();

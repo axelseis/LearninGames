@@ -21,5 +21,6 @@
 	"turns to you": "turns to you",
 	"Sorry": "Sorry",
 	"We were unable to load the page you requested.": "We were unable to load the page you requested.",
-	"Please check your network connection and try again.": "Please check your network connection and try again."
+	"Please check your network connection and try again.": "Please check your network connection and try again.",
+	"Please select an image with a face": "Please select an image that contains your face"
 }

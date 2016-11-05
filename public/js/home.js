@@ -108,7 +108,7 @@ LGamesClient.Home = (function(){
 				detector = new objectdetect.detector(canvasRef.width, canvasRef.height, 1.1, objectdetect.frontalface_alt);
 				
 				rects = detector.detect(canvasRef, 1);
-				if(!rects.length){
+				if(!rects.length || rects[0][2] < 70){
 					imageError.addClass('showing');
 				}
 				else {
@@ -195,7 +195,10 @@ LGamesClient.Home = (function(){
 			marco = $('#marco');
 
       		if(iosBut.length){
-	      		iosBut.on("change", captureIOSFace);      			
+	      		iosBut.on("change", captureIOSFace);
+	      		imageError.on('click', function(event) {
+	      			$(this).removeClass('showing');
+	      		});     			
       		}
       		else{
       			videoBut.on('click', startStopCamera);

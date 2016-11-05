@@ -159,10 +159,10 @@ canvas#canvas {
     /* width: 300px; */
     /* height: 300px; */
     position: fixed;
-    top: 60px;
-    /* visibility: hidden; */
-    background-color: red;
-    z-index: 100;
+    /* top: 60px; */
+    visibility: hidden;
+    /* background-color: red; */
+    /* z-index: 100; */
 }
 
 canvas#canvasRef {

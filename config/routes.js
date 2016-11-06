@@ -35,17 +35,18 @@ module.exports = function(app, passport){
 	  	}
 	});
 
-	/*
 	//TEST
-	app.get('/test', passport.authenticate('test-login', {
-	  successRedirect: '/games/missinglet_er',
+	app.get('/testUser', passport.authenticate('test-login', {
+	  successRedirect: '/games/missingletter',
 	  failureRedirect: '/'
 	  })
 	);
-	*/
+
+	/*
 	app.get('/test', function(req, res){
 		res.render('test', {layout: false});
-	 });
+	});
+	*/
 
 	//CAMERA
 	app.post('/cameraLogin', function(req, res, next) {

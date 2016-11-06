@@ -99,17 +99,20 @@ canvas.gamecanvas {
     width: 100%;
     height: 100%;
     overflow-y: scroll;
+    padding-bottom: 80px;
 }
 
 .playersContainer {
     width: 100%;
     height: 100%;
+    max-width: 100%;
 }
 
 .playersContainer>.player {
     width: 100px;
     height: 100px;
     display: inline-block;
+    vertical-align: top;
 }
 
 *[sol='ok'] {
@@ -128,13 +131,14 @@ footer>img {
 
 .time {
     position: absolute;
-    right: 5%;
+    right: 2%;
     top: 0;
     /* padding: 10px; */
     font-size: 3em;
     width: 20%;
     /* height: 30%; */
     /* background-color: antiquewhite; */
+    color: #868686;
     text-align: right;
 }
 
@@ -279,8 +283,8 @@ div#overlay {
     width: 80%;
     height: 40%;
     min-height: 200px;
-    background-color: rgba(245, 245, 220, 0.69);
-    position: absolute;
+    background-color: rgba(245, 245, 220, 0.86);
+    position: fixed;
     left: 10%;
     bottom: 25%;
     border-radius: 10px;
@@ -290,10 +294,10 @@ div#overlay {
     position: absolute;
     bottom: 10px;
     text-align: center;
-    width: 90%;
+    width: 80%;
     font-size: 80px;
     /* height: 50%; */
-    left: 5%;
+    left: 10%;
 }
 
 .operationModal>.operation .sol{
@@ -668,4 +672,10 @@ input#cameraInput {
     overflow: hidden;
     position: absolute;
     z-index: -1; 
+}
+
+
+.player>img {
+    width: 100%;
+    height: auto;
 }

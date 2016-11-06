@@ -152,8 +152,8 @@ LGamesClient.Home = (function(){
 				clip[3] *= aspectY*1.2;
 
 				var rectW = Math.max(clip[2],clip[3]);
-				var rectX = Math.min(video.videoWidth, Math.max(0,clip[0]));
-				var rectY = Math.min(video.videoHeight, Math.max(0,clip[1]));
+				var rectX = Math.min(video.videoWidth-rectW, Math.max(0,clip[0]));
+				var rectY = Math.min(video.videoHeight-rectW, Math.max(0,clip[1]));
 
 				var videoIncY = (videObj.height() - (video.videoHeight*scaleX))/2;
 				

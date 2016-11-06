@@ -122,7 +122,6 @@
               this.playersContainer.prepend(player);
             }
 
-
             player.attr('sol', playerData[1]);
 
             if(playerData[0] == this.myPlayer.id){

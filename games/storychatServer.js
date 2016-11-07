@@ -34,6 +34,7 @@ StoryChat.prototype = {
 
   _onNewPlayer: function(playerSocket, player){
     var playerRoom = player.room || this.getLocale();
+    var newIndex = (this.actPlayerIndex[playerRoom]||1)-1;
 
     playerSocket.join(playerRoom);
     playerSocket.__playerRoom = playerRoom;
@@ -41,16 +42,15 @@ StoryChat.prototype = {
     if(!this.players[playerRoom]){
       this.players[playerRoom] = [];
     }
-    this.players[playerRoom].push(player);
+    this.players[playerRoom].splice(newIndex,0,player);
 
-    playerSocket.emit('enterGame', this.players[playerRoom], this.story[playerRoom]);
-    playerSocket.broadcast.in(playerRoom).emit('newPlayer', player);
+    playerSocket.emit('enterGame', this.players[playerRoom], this.story[playerRoom], newIndex);
+    playerSocket.broadcast.in(playerRoom).emit('newPlayer', this.players[playerRoom]);
 
     if(!this.story[playerRoom].length){
       this._newStory(playerRoom);
     }
     
-        console.log('this.actPlayerIndex[playerRoom]', this.actPlayerIndex[playerRoom]);
     if(this.actPlayerIndex[playerRoom] == null){
       this._setNextPlayer2Write(playerRoom);
     }

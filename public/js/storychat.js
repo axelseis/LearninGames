@@ -2,6 +2,19 @@
 
 
     LGamesClient.Games.StoryChat = (function(){
+      var botPars = [
+        "Y hubo gran regocijo",
+        "La guerra es la paz. La libertad es la esclavitud. La ignorancia es la fuerza”",
+        "Algún día te morirás por besarme",
+        "Escribo, triste, en mi cuarto quieto, solo, como siempre he sido, solo como siempre seré",
+        "Lo odio por hacerme sentir así. Por darme esperanzas y luego tirar todo por la borda",
+        "Hoy es siempre todavía",
+        "No se ve bien sino con el corazón, lo esencial es invisible a los ojos",
+        "Añorar el pasado es correr tras el viento",
+        "Algo se marchitó en él: quizás la fe en la perennidad de la infancia",
+        "Cierto que casi siempre se encuentra algo, si se mira, pero no siempre es lo que uno busca"
+      ];
+
       var StoryChat = function(userAvatar){
         LGamesClient.Game.call(this,'storychat',userAvatar);
       }
@@ -34,8 +47,8 @@
           this._onNewStory(story);
         },
 
-        _onNewPlayer: function(player){
-          this.players.push(player);
+        _onNewPlayer: function(newplayers){
+          this.players = newplayers;
         },
 
         _onRemovePlayer: function(playerId){
@@ -80,6 +93,15 @@
             this.myturnModal.show();
             this._setCountdown(this.countdownTime);
             this.footer.hide();
+
+            if(this.isTestUser){
+              var decission = Math.random()*1 < 0.5 ? this.dismissBut : this.writeBut;
+              
+              window.setTimeout(decission.click.bind(decission),2000);
+              if(decission == this.writeBut){
+                window.setTimeout(this._writeBotMessage.bind(this),3000);
+              }
+            }
           }
           else{
             var actplayerIndex = this.getPlayerIndexById(newPlayerId);
@@ -90,6 +112,29 @@
           }
 
           this.storyContainer.parent().scrollTop(this.storyContainer.height());
+        },
+
+        _writeBotMessage: function(){
+          var press = jQuery.Event("keyup");
+          if(!this.actBotPar){
+            this.actBotPar = botPars[Math.floor(Math.random()*botPars.length)];
+          }
+          
+          if(this.actBotLetterNum < this.actBotPar.length){
+            press.keyCode = 0;
+
+            this.actPlayerPar.children('.par').html(this.actPlayerPar.children('.par').html() + this.actBotPar.charAt(this.actBotLetterNum));
+            this.actBotLetterNum++;
+
+            window.setTimeout(this._writeBotMessage.bind(this),100)
+          }
+          else{
+            this.actBotLetterNum = 0;
+            this.actBotPar = null;
+            press.keyCode = 13;            
+          }
+
+          this.actPlayerPar.trigger(press);
         },
 
         _setCountdown: function(time){
@@ -162,6 +207,7 @@
           newPar.html(playerPar);
           
           this.actPlayerPar.remove();
+          this.actPlayerPar = null;
           this.usersPars.append(newPar);
 
           this.footerText.html('');
@@ -169,6 +215,7 @@
         },
 
         _onPlayerWrite: function(playerData){
+          console.log('playerData[0] != this.myPlayer.id', playerData[0] != this.myPlayer.id)
           if(playerData[0] != this.myPlayer.id){
             if(!this.actPlayerPar){
               this._onNextPlayer2Write(playerData[0]);
@@ -191,14 +238,21 @@
         init: function(){
           this.countdownTime = 20;
           this.countdownTO;
+          this.isTestUser;
 
           this.storyContainer = $('.storyContainer');
           this.begin = $('#begin');
           this.usersPars = $('#usersPars');
-          this.myturnModal = $('#myturnModal');
           this.myturnCountdown = $('#myturnCountdown');
-          this.actPlayerPar;
           this.actPlayerParTemplate = $('<div class="playerPar"><img class="playerAvatar" src=""/><div class="par"></div>');
+          
+          this.actBotPar;
+          this.actBotLetterNum;          
+          this.actPlayerPar;
+
+          this.myturnModal = $('#myturnModal');
+          this.dismissBut = this.myturnModal.children('#dismissBut');
+          this.writeBut = this.myturnModal.children('#writeBut');
 
           this.footerText = $('footer.footer>.footerText');
           this.footerButs = $('footer.footer>div.buts');
@@ -207,8 +261,12 @@
           this.footerButs.children('a#downloadBut').click(this._onClickDownloadBut.bind(this));
 
           this.myturnModal.children('#endBut').on('click', this._onClickEndBut.bind(this));
-          this.myturnModal.children('#writeBut').on('click', this._onClickWriteBut.bind(this));
-          this.myturnModal.children('#dismissBut').on('click', this._onClickDismissBut.bind(this));
+          this.writeBut.on('click', this._onClickWriteBut.bind(this));
+          this.dismissBut.on('click', this._onClickDismissBut.bind(this));
+          
+          if(this.myPlayer.avatar.indexOf('testuser_') != -1){
+            this.isTestUser = true;
+          }
         }
       }
 

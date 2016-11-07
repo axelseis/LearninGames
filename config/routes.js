@@ -37,7 +37,7 @@ module.exports = function(app, passport){
 
 	//TEST
 	app.get('/testUser', passport.authenticate('test-login', {
-	  successRedirect: '/games/missingletter',
+	  successRedirect: '/games/storychat',
 	  failureRedirect: '/'
 	  })
 	);

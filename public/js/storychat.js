@@ -4,7 +4,7 @@
     LGamesClient.Games.StoryChat = (function(){
       var botPars = [
         "Y hubo gran regocijo",
-        "La guerra es la paz. La libertad es la esclavitud. La ignorancia es la fuerza”",
+        "La guerra es la paz. La libertad es la esclavitud. La ignorancia es la fuerza",
         "Algún día te morirás por besarme",
         "Escribo, triste, en mi cuarto quieto, solo, como siempre he sido, solo como siempre seré",
         "Lo odio por hacerme sentir así. Por darme esperanzas y luego tirar todo por la borda",

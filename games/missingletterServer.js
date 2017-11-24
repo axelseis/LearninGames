@@ -107,6 +107,13 @@ MissingLetter.prototype = {
     }
   },
  
+  _shuffleArray: function(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+  },
+
   _get4RandomLetters: function(excludeletter,templateWord,lang){
     var rand = [];
     var tempLetter = this.letters[lang][Math.floor(Math.random()*this.letters[lang].length)];
@@ -131,7 +138,7 @@ MissingLetter.prototype = {
     var letterN = Math.floor(Math.random()*this.words[lang][wordN].length);
     var letter = word.charAt(letterN);
     var templateWord = word.substr(0, letterN) + '_' + word.substr(letterN+1);
-    var filled = this._get4RandomLetters(letter,templateWord,lang).concat(letter).sort(function(){return 0.5 - Math.random()});
+    var filled = this._shuffleArray(this._get4RandomLetters(letter,templateWord,lang).concat(letter));
 
     this.lastWords[lang].push(wordN);
     if(this.lastWords[lang].length > 200){

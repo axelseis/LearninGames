@@ -107,16 +107,7 @@ MissingLetter.prototype = {
     }
   },
  
-  _shuffleArray: function (array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-  },
-
-  _get4RandomLetters: function(excludeletter,templateWord,lang){
+    _get4RandomLetters: function(excludeletter,templateWord,lang){
     var rand = [];
     var tempLetter = this.letters[lang][Math.floor(Math.random()*this.letters[lang].length)];
 
@@ -127,6 +118,15 @@ MissingLetter.prototype = {
       rand.push(tempLetter);
     }
     return rand;
+  },
+
+  _shuffleArray: function (array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
   },
 
   _getRandomWord: function(lang){
@@ -140,7 +140,10 @@ MissingLetter.prototype = {
     var letterN = Math.floor(Math.random()*this.words[lang][wordN].length);
     var letter = word.charAt(letterN);
     var templateWord = word.substr(0, letterN) + '_' + word.substr(letterN+1);
-    var filled = this._shuffleArray(this._get4RandomLetters(letter,templateWord,lang).concat(letter));
+    var filled = this._get4RandomLetters(letter,templateWord,lang).concat(letter);
+    
+    this._shuffleArray(filled)
+    console.log('filled', filled)
 
     this.lastWords[lang].push(wordN);
     if(this.lastWords[lang].length > 200){

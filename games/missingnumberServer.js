@@ -47,6 +47,15 @@ function get4RandomNumbers(val){
   return rand;
 }
 
+function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+  }
+}
+
 MissingNumber.prototype = {
   
   _onClientConnected: function(client){
@@ -142,6 +151,8 @@ MissingNumber.prototype = {
       tempExp = solPos == 'end' ? tempExp : tempExp.substr(0, solPos) + '_' + tempExp.substr(solPos+1,tempExp.length);
       filled = get4RandomNumbers(solValue).concat(solValue).sort(function(){return 0.5 - Math.random()});
 
+      shuffleArray(filled);
+      
       return [[solPos == 'end' ? tempExp + '=_' : tempExp + '=' + value, filled], solValue];
     }
   },
